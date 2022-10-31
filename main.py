@@ -1,7 +1,7 @@
 import glob
 
 import numpy as np
-from IPython.core.display_functions import clear_output
+from IPython.core.display import clear_output
 from skimage import io
 from matplotlib import pyplot as plt
 import torch
@@ -12,20 +12,26 @@ from torch.nn import Linear, GRU, Conv2d, Dropout, MaxPool2d, BatchNorm1d
 from torch.nn.functional import relu, elu, relu6, sigmoid, tanh, softmax
 import data_utils
 
-
 data = []
 i = 0
 
+# Read the images
 for np_name in glob.glob('carseg_data/clean_data/*.np[yz]'):
-    # print(np_name)
     data.append(np.load(f'{np_name}'))
 
     i += 1
     if i == 10:
         break
-
 data = np.array(data)
 print(data.shape)
+
+data = np.shuffle(data, axis=0)
+train_data = data[:int(0.8*data.shape[0])]
+valid_data = data[int(0.8*data.shape[0]):int(0.9*data.shape[0])]
+test_data = data[int(0.9*data.shape[0]):]
+
+
+
 # for i in range(100):
 #     data[i] = np.load(f'carseg_data/clean_data/{i}.npy')
 
@@ -39,6 +45,7 @@ print("Running GPU.") if use_cuda else print("No GPU available.")
 batch_size = 32
 IMAGE_SHAPE = (3, 256, 256)
 
+
 def get_variable(x):
     """ Converts tensors to cuda, if available. """
     if use_cuda:
@@ -51,6 +58,7 @@ def get_numpy(x):
     if use_cuda:
         return x.cpu().data.numpy()
     return x.data.numpy()
+
 
 class Net(nn.Module):
     def __init__(self):
@@ -68,27 +76,32 @@ class Net(nn.Module):
         out['out'] = self.l_out(features_final)
         return out
 
+
 net = Net()
 if use_cuda:
     net.cuda()
 print(net)
 
 LEARNING_RATE = 0.002
-criterion = nn.CrossEntropyLoss()          # <-- Your code here.
+criterion = nn.CrossEntropyLoss()  # <-- Your code here.
 
 # weight_decay is equal to L2 regularization
 optimizer = optim.AdamW(net.parameters(), lr=LEARNING_RATE, weight_decay=1e-4)
+
 
 def accuracy(ys, ts):
     predictions = torch.max(ys, 1)[1]
     correct_prediction = torch.eq(predictions, ts)
     return torch.mean(correct_prediction.float())
 
+
 _img_shape = tuple([batch_size] + list(IMAGE_SHAPE))
 _feature_shape = (batch_size)
 
+
 def randnorm(size):
     return np.random.normal(0, 1, size).astype('float32')
+
 
 # dummy data
 _x_image = get_variable(Variable(torch.from_numpy(randnorm(_img_shape))))
@@ -188,3 +201,8 @@ for i, batch_train in enumerate(batch_gen.gen_train()):
 
     if max_iter < i:
         break
+
+
+
+
+
