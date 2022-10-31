@@ -10,6 +10,8 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.nn import Linear, GRU, Conv2d, Dropout, MaxPool2d, BatchNorm1d
 from torch.nn.functional import relu, elu, relu6, sigmoid, tanh, softmax
+from torch.utils.data import DataLoader
+
 import data_utils
 
 data = []
@@ -66,7 +68,7 @@ class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
         self.activation_fn = nn.ReLU()
-        self.linear = nn.Linear(4 * 256 * 256, 4 * 256 * 256)
+        self.linear = nn.Linear(256 * 256,256 * 256)
 
     def forward(self, x_img):
         out = {}
@@ -107,9 +109,6 @@ def randnorm(size):
 
 # dummy data
 _x_image = get_variable(Variable(torch.from_numpy(randnorm(_img_shape))))
-_x_margin = get_variable(Variable(torch.from_numpy(randnorm(_feature_shape))))
-_x_shape = get_variable(Variable(torch.from_numpy(randnorm(_feature_shape))))
-_x_texture = get_variable(Variable(torch.from_numpy(randnorm(_feature_shape))))
 
 # test the forward pass
 output = net(x_img=_x_image, x_margin=_x_margin, x_shape=_x_shape, x_texture=_x_texture)
@@ -141,16 +140,15 @@ valid_iter = []
 valid_loss, valid_accs = [], []
 
 # Generate batches
-batch_gen = data_utils.batch_generator(data,
-                                       batch_size=batch_size,
-                                       num_classes=0,
-                                       num_iterations=max_iter,
-                                       seed=42,
-                                       val_size=VALIDATION_SIZE)
+batch = iter(DataLoader(data_utils.ImageDataset(train_data[:,0,:,:], train_data[:,3,:,:]), batch_size=4, shuffle=True))
+x, y = next(batch)
+print('x', x.shape)
+print('y', y.shape)
+
 
 # Train network
 net.train()
-for i, batch_train in enumerate(batch_gen.gen_train()):
+for i, batch_train in enumerate():
     if i % eval_every == 0:
 
         # Do the validaiton
