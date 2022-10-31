@@ -1,3 +1,5 @@
+import glob
+
 import numpy as np
 from IPython.core.display_functions import clear_output
 from skimage import io
@@ -10,18 +12,32 @@ from torch.nn import Linear, GRU, Conv2d, Dropout, MaxPool2d, BatchNorm1d
 from torch.nn.functional import relu, elu, relu6, sigmoid, tanh, softmax
 import data_utils
 
-data = np.load('carseg_data/clean_data/0.npy')
-print(data)
 
-plt.imshow(data[3])
-plt.show()
+data = []
+i = 0
+
+for np_name in glob.glob('carseg_data/clean_data/*.np[yz]'):
+    # print(np_name)
+    data.append(np.load(f'{np_name}'))
+
+    i += 1
+    if i == 10:
+        break
+
+data = np.array(data)
+print(data.shape)
+# for i in range(100):
+#     data[i] = np.load(f'carseg_data/clean_data/{i}.npy')
+
+
+# plt.imshow(data[3])
+# plt.show()
 
 use_cuda = torch.cuda.is_available()
 print("Running GPU.") if use_cuda else print("No GPU available.")
 
 batch_size = 32
 IMAGE_SHAPE = (3, 256, 256)
-NUM_FEATURES = 3* 256 * 256
 
 def get_variable(x):
     """ Converts tensors to cuda, if available. """
@@ -39,10 +55,18 @@ def get_numpy(x):
 class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
+        self.activation_fn = nn.ReLU()
+        self.linear = nn.Linear(4 * 256 * 256, 4 * 256 * 256)
 
-    def forward(self, x_img, x_margin, x_shape, x_texture):
-        features = []
+    def forward(self, x_img):
         out = {}
+
+        x_img = x_img.flatten()
+
+        features_final = self.activation_fn(x_img)
+
+        out['out'] = self.l_out(features_final)
+        return out
 
 net = Net()
 if use_cuda:
@@ -61,7 +85,7 @@ def accuracy(ys, ts):
     return torch.mean(correct_prediction.float())
 
 _img_shape = tuple([batch_size] + list(IMAGE_SHAPE))
-_feature_shape = (batch_size, NUM_FEATURES)
+_feature_shape = (batch_size)
 
 def randnorm(size):
     return np.random.normal(0, 1, size).astype('float32')
@@ -91,10 +115,7 @@ def get_labels(batch):
 # Function to get input
 def get_input(batch):
     return {
-        'x_img': get_variable(Variable(torch.from_numpy(batch['images']))),
-        'x_margin': get_variable(Variable(torch.from_numpy(batch['margins']))),
-        'x_shape': get_variable(Variable(torch.from_numpy(batch['shapes']))),
-        'x_texture': get_variable(Variable(torch.from_numpy(batch['textures'])))
+        'x_img': get_variable(Variable(torch.from_numpy(batch['images'])))
     }
 
 
