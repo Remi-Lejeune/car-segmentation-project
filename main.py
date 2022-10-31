@@ -25,11 +25,13 @@ for np_name in glob.glob('carseg_data/clean_data/*.np[yz]'):
 data = np.array(data)
 print(data.shape)
 
-data = np.shuffle(data, axis=0)
+np.random.shuffle(data)
+
 train_data = data[:int(0.8*data.shape[0])]
 valid_data = data[int(0.8*data.shape[0]):int(0.9*data.shape[0])]
 test_data = data[int(0.9*data.shape[0]):]
 
+print(train_data.shape)
 
 
 # for i in range(100):
