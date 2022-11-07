@@ -84,15 +84,17 @@ class Net(nn.Module):
     def __init__(self, num_features, num_hidden, num_output):
         super(Net, self).__init__()
         # input layer
-        self.linear = nn.Linear(512 * 512, 512 * 512)
+        self.linear = nn.Linear(256 * 256, 256 * 256)
         # define activation function in constructor
         self.activation = torch.nn.ReLU()
 
     def forward(self, x):
+        x = torch.tensor(x.reshape(32, 256*256), dtype=torch.float32)
+        print("tensor")
         x = self.linear(x)
+        print("linear done")
         x = self.activation(x)
-
-        # x = F.linear(x, self.W_2, self.b_2)
+        print("activation done")
 
         return x
 
@@ -187,10 +189,11 @@ for epoch in range(num_epochs):
         torch.nn.Dropout()
         optimizer.zero_grad()
         slce = get_slice(i, batch_size)
-        output = net(torch.tensor(x_train[slce][0].ravel()))
+        output = net(torch.tensor(x_train[slce][:,0,:,:]))
+        print("output done")
 
         # compute gradients given loss
-        target_batch = torch.tensor(x_train[slce][3].ravel())
+        target_batch = torch.tensor(x_train[slce][:,3,:,:])
         batch_loss = criterion(output, target_batch)
         batch_loss.backward()
         optimizer.step()
@@ -207,11 +210,11 @@ for epoch in range(num_epochs):
             break
 
         slce = get_slice(i, batch_size)
-        output = net(torch.tensor(x_train[slce][0].ravel()))
+        output = net(torch.tensor(x_train[slce][:,0,:,:]))
 
         preds = torch.max(output, 1)[1]
 
-        train_targs += list(x_train[slce][3].ravel().numpy())
+        train_targs += list(x_train[slce][:,3,:,:])
         train_preds += list(preds.data.numpy())
 
     ### Evaluate validation
@@ -223,9 +226,9 @@ for epoch in range(num_epochs):
 
         slce = get_slice(i, batch_size)
 
-        output = net(torch.tensor(x_valid[0][slce].ravel()))
+        output = net(torch.tensor(x_train[slce][:,0,:,:]))
         preds = torch.max(output, 1)[1]
-        val_targs += list(x_valid[slce][3].ravel().numpy())
+        val_targs += list(x_train[slce][:,3,:,:].numpy())
         val_preds += list(preds.data.numpy())
 
     train_acc_cur = accuracy_score(train_targs, train_preds)
