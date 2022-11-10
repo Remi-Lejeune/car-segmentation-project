@@ -1,3 +1,5 @@
 .idea/
 .venv/
 carseg_data
+temp
+lightning_logs
