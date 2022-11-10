@@ -171,7 +171,6 @@ class Net(nn.Module):
 
         
     def forward(self, x_img, x_margin, x_shape, x_texture):
-        features = []
         out = {}
         
         # First set of  convolutional layers 
