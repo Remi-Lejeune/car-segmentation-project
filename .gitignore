@@ -3,3 +3,4 @@
 carseg_data
 temp
 lightning_logs
+__pycache__
