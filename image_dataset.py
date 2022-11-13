@@ -1,5 +1,6 @@
 import glob
 
+import numpy as np
 from torch.utils.data import Dataset
 
 
@@ -18,7 +19,17 @@ class ImageDataset(Dataset):
         return len(self.files)
 
     def __getitem__(self, idx):
-        return self.files[idx]
+        x = []
+        y = []
+        list = np.load(self.files[idx]).astype(np.float32)
+
+        x.append(list[0])
+        y.append(list[3])
+
+        x = np.array(x)
+        y = np.array(y)
+
+        return x, y
 
 
 def files_name(path='carseg_data/clean_data/*.np[yz]'):

@@ -4,7 +4,7 @@ from pytorch_lightning import Trainer
 from torch.utils.data import DataLoader
 from image_dataset import ImageDataset, files_name
 from segmentation_model import SegmentationModel
-from network import Net
+from Unet_pp import Unet_pp
 
 
 files = files_name()
@@ -22,7 +22,7 @@ train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=True)
 validation_dataloader = DataLoader(validation_dataset, batch_size=32, shuffle=True)
 
-model = SegmentationModel(Net())
+model = SegmentationModel(Unet_pp(256, 256, 1))
 
 trainer = Trainer(
     max_epochs=10,

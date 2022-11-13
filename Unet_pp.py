@@ -14,7 +14,7 @@ class Unet_pp(nn.Module):
     def __init__(self, im_height, im_width, im_channels, activationFun="Relu", maxpool_kernel_size=2, 
                 maxpool_kernel_stride=2, conv_kernel_size = 3, conv_kernel_stride=1, conv_padding=0, conv_dilation=1, 
                 conv_out_channels_0 = 32, upconv_kernel_size=2, upconv_kernel_stride=1, upconv_padding=0):
-        #super(Unet_pp, self).__init__()
+        super(Unet_pp, self).__init__()
 
         if activationFun=="Relu":
             self.activation = ReLU()
