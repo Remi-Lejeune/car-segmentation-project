@@ -289,13 +289,13 @@ class Unet_pp(nn.Module):
 
 
         out_upconv_04 = self.upconv_04(out_conv_13)
-        crop_00 = CenterCrop(size = out_upconv_13.size(dim=2))
+        crop_00 = CenterCrop(size = out_upconv_04.size(dim=2))
         out_conv_00_crop = crop_00(out_conv_00)
-        crop_01 = CenterCrop(size = out_upconv_13.size(dim=2))
+        crop_01 = CenterCrop(size = out_upconv_04.size(dim=2))
         out_conv_01_crop = crop_01(out_conv_01)
-        crop_02 = CenterCrop(size = out_upconv_13.size(dim=2))
+        crop_02 = CenterCrop(size = out_upconv_04.size(dim=2))
         out_conv_02_crop = crop_02(out_conv_02)
-        crop_03 = CenterCrop(size = out_upconv_13.size(dim=2))
+        crop_03 = CenterCrop(size = out_upconv_04.size(dim=2))
         out_conv_03_crop = crop_03(out_conv_03)
         out_concat_04 = torch.cat((out_conv_00_crop, out_conv_01_crop, out_conv_02_crop, out_conv_03_crop, out_upconv_04), dim = 1)
         out_conv_04 = self.conv_04(out_concat_04)
