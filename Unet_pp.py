@@ -11,7 +11,7 @@ from torchvision.transforms import CenterCrop
 
     
 class Unet_pp(nn.Module):
-    def __init__(self, im_height, im_width, im_channels, activationFun="Relu", maxpool_kernel_size=2, 
+    def __init__(self, im_height, im_width, im_channels, num_features, activationFun="Relu", maxpool_kernel_size=2, 
                 maxpool_kernel_stride=2, conv_kernel_size = 3, conv_kernel_stride=1, conv_padding=0, conv_dilation=1, 
                 conv_out_channels_0 = 32, upconv_kernel_size=2, upconv_kernel_stride=1, upconv_padding=0):
         super(Unet_pp, self).__init__()
@@ -115,6 +115,12 @@ class Unet_pp(nn.Module):
 
         self.conv_04 = Conv2d(in_channels = conv_out_channels_0 + conv_out_channels_0 + conv_out_channels_0 + conv_out_channels_0 + conv_out_channels_0, 
                                 out_channels = conv_out_channels_0, 
+                                kernel_size = conv_kernel_size,
+                                stride = conv_kernel_stride,
+                                padding = conv_padding)
+
+        self.conv_final = Conv2d(in_channels = conv_out_channels_0,
+                                out_channels = num_features, 
                                 kernel_size = conv_kernel_size,
                                 stride = conv_kernel_stride,
                                 padding = conv_padding)
@@ -301,9 +307,8 @@ class Unet_pp(nn.Module):
         out_conv_04 = self.conv_04(out_concat_04)
         out_conv_04 = self.activation(out_conv_04)
 
-
         # Output
-        out = out_conv_04
+        out = self.conv_final(out_conv_04)
         return out
 
 
