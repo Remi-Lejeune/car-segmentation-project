@@ -198,9 +198,8 @@ class Net(nn.Module):
         out_upconv_4 = self.upconv_4(out_conv_4) # Output size from this layer (48, 48, 256)
 
         # Crop the output from conv_3 to fit the output from upconv_4 and concatenate the two
-        out_conv_3_cropped = CenterCrop(size = out_upconv_4.size(dim=0))(torch.permute(out_conv_3, (2,0,1)))
-        out_conv_3_cropped = torch.permute(out_conv_3_cropped, (1,2,0))
-        out_concat_4 = torch.cat((out_conv_3_cropped, out_upconv_4), dim = 2)  # Size (48, 48, 512)
+        out_conv_3_cropped = CenterCrop(size = out_upconv_4.size(dim=2))
+        out_concat_4 = torch.cat((out_conv_3_cropped, out_upconv_4), dim = 1)  # Size (48, 48, 512)
 
 
         # Fith set of convolutional layers
@@ -213,9 +212,8 @@ class Net(nn.Module):
         out_upconv_5 = self.upconv_5(out_conv_5) # Output size from this layer (88, 88, 128)
 
         # Crop the output from conv_2 to fit the output from upconv_5 and concatenate the two
-        out_conv_2_cropped = CenterCrop(size = out_upconv_5.size(dim=0))(torch.permute(out_conv_2, (2,0,1)))
-        out_conv_2_cropped = torch.permute(out_conv_2_cropped, (1,2,0))
-        out_concat_5 = torch.cat((out_conv_2_cropped, out_upconv_5), dim = 2)  # Size (88, 88, 256)
+        out_conv_2_cropped = CenterCrop(size = out_upconv_5.size(dim=2))
+        out_concat_5 = torch.cat((out_conv_2_cropped, out_upconv_5), dim = 1)  # Size (88, 88, 256)
 
 
         # Sixth set of convolutional layers
@@ -228,9 +226,8 @@ class Net(nn.Module):
         out_upconv_6 = self.upconv_6(out_conv_6) # Output size from this layer (168, 168, 64)
 
         # Crop the output from conv_1 to fit the output from upconv_6 and concatenate the two
-        out_conv_1_cropped = CenterCrop(size = out_upconv_6.size(dim=0))(torch.permute(out_conv_1, (2,0,1)))
-        out_conv_1_cropped = torch.permute(out_conv_1_cropped, (1,2,0))
-        out_concat_6 = torch.cat((out_conv_1_cropped, out_upconv_6), dim = 2)  # Size (168, 168, 128)
+        out_conv_1_cropped = CenterCrop(size = out_upconv_6.size(dim=2))
+        out_concat_6 = torch.cat((out_conv_1_cropped, out_upconv_6), dim = 1)  # Size (168, 168, 128)
 
 
         # Seventh set of convolutional layers
