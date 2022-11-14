@@ -4,8 +4,8 @@ from pytorch_lightning import Trainer
 from torch.utils.data import DataLoader
 from image_dataset import ImageDataset, files_name
 from segmentation_model import SegmentationModel
-from Unet_pp import Unet_pp
-
+from Unet_pp_v2 import Unet_pp
+# from torchsummary import summary
 
 files = files_name()
 np.random.shuffle(files)
@@ -22,7 +22,8 @@ train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=True)
 validation_dataloader = DataLoader(validation_dataset, batch_size=32, shuffle=True)
 
-model = SegmentationModel(Unet_pp(256, 256, 1))
+model = SegmentationModel(Unet_pp(256, 256, 1, 1))
+# summary(Unet_pp(256, 256, 1, 1), (1, 256, 256))
 
 trainer = Trainer(
     max_epochs=10,
