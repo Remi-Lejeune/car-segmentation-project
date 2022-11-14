@@ -13,7 +13,7 @@ from torchvision.transforms import CenterCrop
 class Unet_pp(nn.Module):
     def __init__(self, im_height, im_width, im_channels, num_features, activationFun="Relu", 
                 conv_kernel_size = 3, conv_kernel_stride=1, conv_padding=1, conv_dilation=1, 
-                conv_out_channels_0 = 32, upconv_kernel_size=2, upconv_kernel_stride=1, upconv_padding=1):
+                conv_out_channels_0 = 32, upconv_kernel_size=3, upconv_kernel_stride=1, upconv_padding=1):
         super(Unet_pp, self).__init__()
 
         if activationFun=="Relu":
