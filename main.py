@@ -5,6 +5,7 @@ from torch.utils.data import DataLoader
 from image_dataset import ImageDataset, files_name
 from segmentation_model import SegmentationModel
 from Unet_pp import Unet_pp
+from DataAugmentation import DataAugmentation
 
 
 files = files_name()
@@ -18,9 +19,14 @@ train_dataset = ImageDataset(train_files, size=200)
 test_dataset = ImageDataset(test_files, size=200)
 validation_dataset = ImageDataset(validation_files, size=200)
 
+# Augment the training and validation data
+train_dataset = DataAugmentation(train_dataset)
+validation_dataset = DataAugmentation(validation_dataset)
+
 train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=True)
 validation_dataloader = DataLoader(validation_dataset, batch_size=32, shuffle=True)
+
 
 model = SegmentationModel(Unet_pp(256, 256, 1))
 

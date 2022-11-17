@@ -2,6 +2,8 @@ import glob
 
 import numpy as np
 from torch.utils.data import Dataset
+from torch.nn.functional import one_hot
+import torch
 
 
 class ImageDataset(Dataset):
@@ -23,8 +25,15 @@ class ImageDataset(Dataset):
         y = []
         list = np.load(self.files[idx]).astype(np.float32)
 
-        x.append(list[0])
-        y.append(list[3])
+        for i in range(len(list)):
+            # One-hot encoding of segmentation
+            seg = torch.tensor(list[i][3])
+            seg = one_hot(seg.to(torch.int64), num_classes=9)
+            seg = torch.permute(seg, (2,0,1))
+
+            # Add image and segmentation to lists
+            x.append(list[i][0:3])
+            y.append(np.array(seg))
 
         x = np.array(x)
         y = np.array(y)
