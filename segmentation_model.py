@@ -8,12 +8,12 @@ class SegmentationModel(pl.LightningModule):
     def __init__(self, network):
         super().__init__()
         self.network = network
-        self.loss = nn.CrossEntropyLoss()
+        self.loss = nn.NLLLoss()
 
     def training_step(self, batch, batch_nb):
         x, y = batch
         x_hat = self.network(x)
-        loss = cross_entropy(x_hat, y)
+        loss = self.loss(torch.log(x_hat), y)
 
         self.log("train_loss", loss)
         return loss
@@ -21,7 +21,7 @@ class SegmentationModel(pl.LightningModule):
     def test_step(self, batch, batch_idx):
         x, y = batch
         x_hat = self.network(x)
-        loss = cross_entropy(x_hat, y)
+        loss = self.loss(torch.log(x_hat), y)
 
         self.log("test_loss", loss)
         return loss
@@ -29,7 +29,9 @@ class SegmentationModel(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         x, y = batch
         x_hat = self.network(x)
-        loss = cross_entropy(x_hat, y)
+        # print("x_hat", x_hat.shape)
+        # print("y", y.shape)
+        loss = self.loss(torch.log(x_hat), y)
 
         self.log("validation_loss", loss)
         return loss
