@@ -28,7 +28,7 @@ class ImageDataset(Dataset):
         # One-hot encoding of segmentation
         seg = torch.tensor(list[3])
         seg = one_hot(seg.to(torch.int64), num_classes=9)
-        seg = torch.permute(seg, (2, 1, 0))
+        seg = torch.permute(seg, (2, 0, 1))
 
         # Add image and segmentation to lists
         # x.append(list[i][0:3])

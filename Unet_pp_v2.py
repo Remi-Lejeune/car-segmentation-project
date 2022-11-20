@@ -300,7 +300,7 @@ class Unet_pp(nn.Module):
         out_conv_04 = self.conv_04(out_concat_04)
         out_conv_04 = self.activation(out_conv_04)
 
-        # Output
+        # Output<
         out = self.conv_final(out_conv_04)
 
         # Apply softmax along the channel dimension
@@ -308,11 +308,11 @@ class Unet_pp(nn.Module):
         out = sftmx(out)
 
         # Apply argmax to find the class with the largest probability for each pixel.
-        out = torch.argmax(out, dim=1)
+        #out = torch.argmax(out, dim=1)
 
         # One-hot encoding of the segmentation
-        out = one_hot(out.to(torch.int64), num_classes=9)
-        out = torch.permute(out, (0,3,1,2))
+        #out = one_hot(out.to(torch.int64), num_classes=9)
+        #out = torch.permute(out, (0,3,1,2))
 
         return out
 
