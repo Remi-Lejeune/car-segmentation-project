@@ -28,7 +28,7 @@ test_dataloader = DataLoader(test_dataset, batch_size=16, shuffle=True)
 validation_dataloader = DataLoader(validation_dataset, batch_size=16, shuffle=True)
 
 
-model = SegmentationModel(Unet_pp(256, 256, 3, 9))
+model = SegmentationModel()
 
 trainer = Trainer(
     accelerator="gpu",

@@ -3,11 +3,13 @@ import torch
 from torch import nn
 from torch.nn.functional import cross_entropy
 
+from Unet_pp_v2 import Unet_pp
+
 
 class SegmentationModel(pl.LightningModule):
-    def __init__(self, network):
+    def __init__(self):
         super().__init__()
-        self.network = network
+        self.network = Unet_pp(256, 256, 3, 9)
         self.loss = nn.CrossEntropyLoss()
 
     def training_step(self, batch, batch_nb):
@@ -38,5 +40,8 @@ class SegmentationModel(pl.LightningModule):
 
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=0.02)
+
+    def forward(self, x):
+        return self.network.forward(x)
 
 
