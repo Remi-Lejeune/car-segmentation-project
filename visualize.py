@@ -6,7 +6,8 @@ from torch.utils.data import DataLoader
 from image_dataset import ImageDataset, files_name
 from Unet_pp_v2 import Unet_pp
 import torch
-
+list = [0,1,2,3,4,5,6,7,8,9]
+print(list[1:])
 files = files_name()
 np.random.shuffle(files)
 
@@ -17,17 +18,17 @@ validation_files = files[int(len(files) * 0.9):]
 test_dataset = ImageDataset(test_files, size=1)
 test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=True)
 
-model = SegmentationModel.load_from_checkpoint(checkpoint_path="epoch=6-step=1232.ckpt")
+# model = SegmentationModel.load_from_checkpoint(checkpoint_path="epoch=6-step=1232.ckpt")
 
 # disable randomness, dropout, etc...
-model.eval()
+# model.eval()
 
 x, y = next(iter(test_dataloader))
 
 # predict with the model
-y_hat = model(x)
+# y_hat = model(x)
 
-y_hat = y_hat.detach().numpy()
+# y_hat = y_hat.detach().numpy()
 y = y.detach().numpy()
 
 fig, axs = plt.subplots(nrows=3, ncols=3, figsize=(18,18))

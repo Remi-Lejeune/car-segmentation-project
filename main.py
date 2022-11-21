@@ -8,6 +8,8 @@ from Unet_pp_v2 import Unet_pp
 from DataAugmentation import DataAugmentation
 
 
+
+
 files = files_name()
 np.random.shuffle(files)
 
@@ -23,9 +25,9 @@ validation_dataset = ImageDataset(validation_files)
 # train_dataset = DataAugmentation(train_dataset)
 # validation_dataset = DataAugmentation(validation_dataset)
 
-train_dataloader = DataLoader(train_dataset, batch_size=16, shuffle=True)
-test_dataloader = DataLoader(test_dataset, batch_size=16, shuffle=True)
-validation_dataloader = DataLoader(validation_dataset, batch_size=16, shuffle=True)
+train_dataloader = DataLoader(train_dataset, batch_size=8, shuffle=True)
+test_dataloader = DataLoader(test_dataset, batch_size=8, shuffle=True)
+validation_dataloader = DataLoader(validation_dataset, batch_size=8, shuffle=True)
 
 
 model = SegmentationModel()

@@ -13,30 +13,13 @@ class SegmentationModel(pl.LightningModule):
         self.loss = nn.CrossEntropyLoss()
 
     def training_step(self, batch, batch_nb):
-        x, y = batch
-        x_hat = self.network(x).flatten(start_dim=2).float()
-        loss = self.loss((x_hat), y.flatten(start_dim=2).float())
-
-        self.log("train_loss", loss)
-        return loss
+        return self.helper(batch, batch_nb, "train_loss")
 
     def test_step(self, batch, batch_idx):
-        x, y = batch
-        x_hat = self.network(x).flatten(start_dim=2).float()
-        loss = self.loss((x_hat), y.flatten(start_dim=2).float())
-
-        self.log("test_loss", loss)
-        return loss
+        return self.helper(batch, batch_idx, "test_loss")
 
     def validation_step(self, batch, batch_idx):
-        x, y = batch
-        x_hat = self.network(x).flatten(start_dim=2).float()
-        print("x_hat", x_hat.shape)
-        print("y", y.shape)
-        loss = self.loss((x_hat), y.flatten(start_dim=2).float())
-
-        self.log("validation_loss", loss)
-        return loss
+        return self.helper(batch, batch_idx, "val_loss")
 
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=0.02)
@@ -44,4 +27,10 @@ class SegmentationModel(pl.LightningModule):
     def forward(self, x):
         return self.network.forward(x)
 
+    def helper(self, batch, batch_idx, mode):
+        x, y = batch
+        x_hat = self.network(x)
+        loss = self.loss(x_hat[:, 1:], y.long())
 
+        self.log(mode, loss)
+        return loss
