@@ -20,14 +20,13 @@ test_dataset = ImageDataset(test_files)
 validation_dataset = ImageDataset(validation_files)
 
 # Augment the training and validation data
-train_dataset = DataAugmentation(train_dataset)
-validation_dataset = DataAugmentation(validation_dataset)
+# train_dataset = DataAugmentation(train_dataset)
+# validation_dataset = DataAugmentation(validation_dataset)
 
 
 train_dataloader = DataLoader(train_dataset, batch_size=16, shuffle=True)
 test_dataloader = DataLoader(test_dataset, batch_size=16, shuffle=True)
 validation_dataloader = DataLoader(validation_dataset, batch_size=16, shuffle=True)
-
 
 
 
@@ -43,7 +42,7 @@ for  batch_im, batch_label in it:
         total_pixels[total_pixels == 0] += 1
         weights += label.size()[1] / (9*total_pixels)
                 
-weights=weights/len(train_dataset.files)
+weights= weights/len(train_dataset.files)
 weights = torch.from_numpy(weights)
 
 

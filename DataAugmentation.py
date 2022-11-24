@@ -1,7 +1,8 @@
 import random
 import torchvision.transforms.functional as TF
-from torchvision import transforms 
+from torchvision import transforms
 import torch
+
 
 def DataAugmentation(data, pflip=0.2, pcrop=0.2, min_crop_sz=200, prot=0.2, max_rot_ang=30):
     # Randomly flip images horizontally

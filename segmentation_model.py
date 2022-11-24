@@ -8,8 +8,9 @@ from Unet_pp_v2 import Unet_pp
 
 
 class SegmentationModel(pl.LightningModule):
-    def __init__(self,weights):
+    def __init__(self, weights):
         super().__init__()
+        self.save_hyperparameters()
         self.network = Unet_pp(256, 256, 3, 9)
         self.loss = nn.CrossEntropyLoss(weight=weights)
 
