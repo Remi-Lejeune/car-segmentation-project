@@ -27,17 +27,22 @@ class ImageDataset(Dataset):
 
         # One-hot encoding of segmentation
         seg = torch.tensor(list[3])
-        seg = one_hot(seg.to(torch.int64), num_classes=9)
+        seg =  one_hot(seg.to(torch.int64), num_classes=9)
         seg = torch.permute(seg, (2, 0, 1))
 
         # Add image and segmentation to lists
         # x.append(list[i][0:3])
         # y.append(np.array(seg))
 
+        # Grayscale the images
         x = np.array(list[:3])
+        x = np.dot(x[...,:3], [0.2989, 0.5870, 0.1140])
+
         y = np.array(seg)
         return x, y
 
+    def __append__(self, new):
+        self.files.append(new)
 
-def files_name(path='carseg_data/clean_data/*.np[yz]'):
+def files_name(path='clean_data/*.np[yz]'):
     return glob.glob(path)

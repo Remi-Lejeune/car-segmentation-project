@@ -2,15 +2,27 @@ import pytorch_lightning as pl
 import torch
 from torch import nn
 from torch.nn.functional import cross_entropy
+import numpy as np
 
 from Unet_pp_v2 import Unet_pp
 
 
 class SegmentationModel(pl.LightningModule):
-    def __init__(self):
+    def __init__(self,weights):
         super().__init__()
         self.network = Unet_pp(256, 256, 3, 9)
-        self.loss = nn.CrossEntropyLoss()
+        self.loss = nn.CrossEntropyLoss(weight=weights)
+
+        self.apply(self._init_weights)
+
+    def _init_weights(self, module):
+        if isinstance(module, nn.Conv2d):
+            N=module.in_channels*module.kernel_size[0]*module.kernel_size[1]
+            module.weight.data.normal_(mean=0.0, std=np.sqrt((2/N)))
+
+        if isinstance(module, nn.ConvTranspose2d):
+            N=module.in_channels*module.kernel_size[0]*module.kernel_size[1]
+            module.weight.data.normal_(mean=0.0, std=np.sqrt((2/N)))
 
     def training_step(self, batch, batch_nb):
         x, y = batch

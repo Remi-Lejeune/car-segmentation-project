@@ -1,14 +1,21 @@
 import random
 import torchvision.transforms.functional as TF
-
+from torchvision import transforms 
+import torch
 
 def DataAugmentation(data, pflip=0.2, pcrop=0.2, min_crop_sz=200, prot=0.2, max_rot_ang=30):
     # Randomly flip images horizontally
     im_num = len(data)
     for i in range(im_num):
+        im = torch.from_numpy(data[i][0])
+        seg = torch.from_numpy(data[i][1])
+        if i == 0:
+            print(seg)
+
         if random.random() < pflip:
-            trans_im = TF.hflip(data[i])
-            data.append(trans_im)
+            trans_im = TF.hflip(im)
+            trans_seg = TF.hflip(seg)
+            data.__append__(trans_im)
 
     # Crop images at random
     im_num = len(data)
