@@ -300,12 +300,12 @@ class Unet_pp(nn.Module):
         out_conv_04 = self.conv_04(out_concat_04)
         out_conv_04 = self.activation(out_conv_04)
 
-        # Output<
+        # Output
         out = self.conv_final(out_conv_04)
 
         # Apply softmax along the channel dimension
-        sftmx = Softmax(dim=1)
-        out = sftmx(out)
+        # sftmx = Softmax(dim=1)
+        # out = sftmx(out)
 
         # Apply argmax to find the class with the largest probability for each pixel.
         #out = torch.argmax(out, dim=1)

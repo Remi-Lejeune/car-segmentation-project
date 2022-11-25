@@ -34,7 +34,8 @@ class ImageDataset(Dataset):
         # x.append(list[i][0:3])
         # y.append(np.array(seg))
 
-        x = np.array(list[:3])
+        # x = np.array(list[:3])
+        x = rgb2gray(list[:3])
         y = np.array(seg)
         return x, y
 
@@ -57,5 +58,7 @@ def get_npy_filenames(photos_file_names):
     return clean_data_filenames
 
 
-
-
+def rgb2gray(rgb):
+    r, g, b = rgb[0, :, :], rgb[1, :, :], rgb[2, :, :]
+    gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
+    return gray.reshape(1, rgb.shape[1], rgb.shape[2])
