@@ -2,13 +2,15 @@ import torch
 import numpy as np
 from pytorch_lightning import Trainer
 from torch.utils.data import DataLoader
-from image_dataset import ImageDataset, files_name
+from image_dataset import *
 from segmentation_model import SegmentationModel
 from Unet_pp_v2 import Unet_pp
 from DataAugmentation import DataAugmentation
 
 
-files = files_name()
+#files = files_name()
+files = get_photo_filenames()
+
 np.random.shuffle(files)
 
 train_files = files[: int(len(files) * 0.8)]
