@@ -1,9 +1,9 @@
 import glob
-
 import numpy as np
 from torch.utils.data import Dataset
 from torch.nn.functional import one_hot
 import torch
+import os
 
 
 class ImageDataset(Dataset):
@@ -44,16 +44,18 @@ def files_name(path='carseg_data/clean_data/*.np[yz]'):
 
 
 def photos_file_name(path='carseg_data/carseg_raw_data/train/photo/*.jpg'):
-    return glob.glob(path)
+    list = [os.path.normpath(i) for i in glob.glob(path)]
+    return list
 
-
-def get_photo_filenames(photos_file_names=photos_file_name()):
+def get_npy_filenames(photos_file_names):
     clean_data_filenames = []
     for file_name in photos_file_names:
-        image_file = file_name.split('\\')[1]
+        image_file = file_name.split("/")[-1]
         image_name = image_file.split('.')[0]
-        path = glob.glob("carseg_data/clean_data/"+image_name+".npy")
-        clean_data_filenames.append(path[0])
+        path_list = glob.glob("carseg_data/clean_data/"+image_name+".npy")
+        clean_data_filenames.append(path_list[0])
     return clean_data_filenames
+
+
 
 

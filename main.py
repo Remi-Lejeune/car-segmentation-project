@@ -9,8 +9,7 @@ from DataAugmentation import DataAugmentation
 
 
 #files = files_name()
-files = get_photo_filenames()
-
+files = get_npy_filenames(photos_file_name())
 np.random.shuffle(files)
 
 train_files = files[: int(len(files) * 0.8)]
