@@ -6,15 +6,14 @@ import torch.optim as optim
 from torch.nn import Linear, GRU, Conv2d, Dropout, MaxPool2d, BatchNorm1d, ConvTranspose2d
 from torch.nn.functional import relu, elu, relu6, sigmoid, tanh, softmax, one_hot
 from torch.nn import ReLU, Sigmoid, Softmax
-import numpy as np
 from torchvision.transforms import CenterCrop
 
-    
+
 class Unet_pp(nn.Module):
-    def __init__(self, im_height, im_width, im_channels, num_features, activationFun="Relu", 
-                conv_kernel_size = 3, conv_kernel_stride=1, conv_padding=1, conv_dilation=1, 
+    def __init__(self, im_height, im_width, im_channels, num_features, activationFun="Relu",
+                conv_kernel_size = 3, conv_kernel_stride=1, conv_padding=1, conv_dilation=1,
                 conv_out_channels_0 = 32, upconv_kernel_size=3, upconv_kernel_stride=1, upconv_padding=1):
-        super(Unet_pp, self).__init__()
+        super().__init__()
 
         if activationFun=="Relu":
             self.activation = ReLU()
@@ -23,188 +22,190 @@ class Unet_pp(nn.Module):
         else:
             raise ValueError('Invalid activation function')
 
-        self.conv_00 = Conv2d(in_channels = im_channels, 
-                                out_channels = conv_out_channels_0, 
-                                kernel_size = conv_kernel_size,
-                                stride = conv_kernel_stride,
-                                padding = conv_padding) 
-
-        self.conv_10 = Conv2d(in_channels = conv_out_channels_0, 
-                                out_channels = 2*conv_out_channels_0, 
-                                kernel_size = conv_kernel_size,
-                                stride = conv_kernel_stride,
-                                padding = conv_padding)
-        
-        self.conv_20 = Conv2d(in_channels = 2*conv_out_channels_0, 
-                                out_channels = 4*conv_out_channels_0, 
+        self.conv_00 = Conv2d(in_channels = im_channels,
+                                out_channels = conv_out_channels_0,
                                 kernel_size = conv_kernel_size,
                                 stride = conv_kernel_stride,
                                 padding = conv_padding)
 
-        self.conv_30 = Conv2d(in_channels = 4*conv_out_channels_0, 
-                                out_channels = 8*conv_out_channels_0, 
+        self.conv_10 = Conv2d(in_channels = conv_out_channels_0,
+                                out_channels = 2*conv_out_channels_0,
                                 kernel_size = conv_kernel_size,
                                 stride = conv_kernel_stride,
                                 padding = conv_padding)
-        
-        self.conv_40 = Conv2d(in_channels = 8*conv_out_channels_0, 
-                                out_channels = 16*conv_out_channels_0, 
+
+        self.conv_20 = Conv2d(in_channels = 2*conv_out_channels_0,
+                                out_channels = 4*conv_out_channels_0,
+                                kernel_size = conv_kernel_size,
+                                stride = conv_kernel_stride,
+                                padding = conv_padding)
+
+        self.conv_30 = Conv2d(in_channels = 4*conv_out_channels_0,
+                                out_channels = 8*conv_out_channels_0,
+                                kernel_size = conv_kernel_size,
+                                stride = conv_kernel_stride,
+                                padding = conv_padding)
+
+        self.conv_40 = Conv2d(in_channels = 8*conv_out_channels_0,
+                                out_channels = 16*conv_out_channels_0,
                                 kernel_size = conv_kernel_size,
                                 stride = conv_kernel_stride,
                                 padding = conv_padding)
 
 
         # Convolutional layers in skip-pathways
-        self.conv_01 = Conv2d(in_channels = conv_out_channels_0 + conv_out_channels_0, 
-                                out_channels = conv_out_channels_0, 
+        self.conv_01 = Conv2d(in_channels = conv_out_channels_0 + conv_out_channels_0,
+                                out_channels = conv_out_channels_0,
                                 kernel_size = conv_kernel_size,
                                 stride = conv_kernel_stride,
                                 padding = conv_padding)
 
-        self.conv_11 = Conv2d(in_channels = 2*conv_out_channels_0 + 2*conv_out_channels_0, 
-                                out_channels = 2*conv_out_channels_0, 
+        self.conv_11 = Conv2d(in_channels = 2*conv_out_channels_0 + 2*conv_out_channels_0,
+                                out_channels = 2*conv_out_channels_0,
                                 kernel_size = conv_kernel_size,
                                 stride = conv_kernel_stride,
                                 padding = conv_padding)
-        
-        self.conv_21 = Conv2d(in_channels = 4*conv_out_channels_0 + 4*conv_out_channels_0, 
-                                out_channels = 4*conv_out_channels_0, 
+
+        self.conv_21 = Conv2d(in_channels = 4*conv_out_channels_0 + 4*conv_out_channels_0,
+                                out_channels = 4*conv_out_channels_0,
                                 kernel_size = conv_kernel_size,
                                 stride = conv_kernel_stride,
                                 padding = conv_padding)
-        
-        self.conv_31 = Conv2d(in_channels = 8*conv_out_channels_0 + 8*conv_out_channels_0, 
-                                out_channels = 8*conv_out_channels_0, 
+
+        self.conv_31 = Conv2d(in_channels = 8*conv_out_channels_0 + 8*conv_out_channels_0,
+                                out_channels = 8*conv_out_channels_0,
                                 kernel_size = conv_kernel_size,
                                 stride = conv_kernel_stride,
                                 padding = conv_padding)
 
 
-        self.conv_02 = Conv2d(in_channels = conv_out_channels_0 + conv_out_channels_0 + conv_out_channels_0, 
-                                out_channels = conv_out_channels_0, 
-                                kernel_size = conv_kernel_size,
-                                stride = conv_kernel_stride,
-                                padding = conv_padding)
-        
-        self.conv_12 = Conv2d(in_channels = 2*conv_out_channels_0 + 2*conv_out_channels_0 + 2*conv_out_channels_0, 
-                                out_channels = 2*conv_out_channels_0, 
-                                kernel_size = conv_kernel_size,
-                                stride = conv_kernel_stride,
-                                padding = conv_padding)
-        
-        self.conv_22 = Conv2d(in_channels = 4*conv_out_channels_0 + 4*conv_out_channels_0 + 4*conv_out_channels_0, 
-                                out_channels = 4*conv_out_channels_0, 
-                                kernel_size = conv_kernel_size,
-                                stride = conv_kernel_stride,
-                                padding = conv_padding)
-        
-        self.conv_03 = Conv2d(in_channels = conv_out_channels_0 + conv_out_channels_0 + conv_out_channels_0 + conv_out_channels_0, 
-                                out_channels = conv_out_channels_0, 
-                                kernel_size = conv_kernel_size,
-                                stride = conv_kernel_stride,
-                                padding = conv_padding)
-        
-        self.conv_13 = Conv2d(in_channels = 2*conv_out_channels_0 + 2*conv_out_channels_0 + 2*conv_out_channels_0 + 2*conv_out_channels_0, 
-                                out_channels = 2*conv_out_channels_0, 
+        self.conv_02 = Conv2d(in_channels = conv_out_channels_0 + conv_out_channels_0 + conv_out_channels_0,
+                                out_channels = conv_out_channels_0,
                                 kernel_size = conv_kernel_size,
                                 stride = conv_kernel_stride,
                                 padding = conv_padding)
 
-        self.conv_04 = Conv2d(in_channels = conv_out_channels_0 + conv_out_channels_0 + conv_out_channels_0 + conv_out_channels_0 + conv_out_channels_0, 
-                                out_channels = conv_out_channels_0, 
+        self.conv_12 = Conv2d(in_channels = 2*conv_out_channels_0 + 2*conv_out_channels_0 + 2*conv_out_channels_0,
+                                out_channels = 2*conv_out_channels_0,
+                                kernel_size = conv_kernel_size,
+                                stride = conv_kernel_stride,
+                                padding = conv_padding)
+
+        self.conv_22 = Conv2d(in_channels = 4*conv_out_channels_0 + 4*conv_out_channels_0 + 4*conv_out_channels_0,
+                                out_channels = 4*conv_out_channels_0,
+                                kernel_size = conv_kernel_size,
+                                stride = conv_kernel_stride,
+                                padding = conv_padding)
+
+        self.conv_03 = Conv2d(in_channels = conv_out_channels_0 + conv_out_channels_0 + conv_out_channels_0 + conv_out_channels_0,
+                                out_channels = conv_out_channels_0,
+                                kernel_size = conv_kernel_size,
+                                stride = conv_kernel_stride,
+                                padding = conv_padding)
+
+        self.conv_13 = Conv2d(in_channels = 2*conv_out_channels_0 + 2*conv_out_channels_0 + 2*conv_out_channels_0 + 2*conv_out_channels_0,
+                                out_channels = 2*conv_out_channels_0,
+                                kernel_size = conv_kernel_size,
+                                stride = conv_kernel_stride,
+                                padding = conv_padding)
+
+        self.conv_04 = Conv2d(in_channels = conv_out_channels_0 + conv_out_channels_0 + conv_out_channels_0 + conv_out_channels_0 + conv_out_channels_0,
+                                out_channels = conv_out_channels_0,
                                 kernel_size = conv_kernel_size,
                                 stride = conv_kernel_stride,
                                 padding = conv_padding)
 
         self.conv_final = Conv2d(in_channels = conv_out_channels_0,
-                                out_channels = num_features, 
+                                out_channels = num_features,
                                 kernel_size = conv_kernel_size,
                                 stride = conv_kernel_stride,
                                 padding = conv_padding)
 
 
         # Up-convolutional layers
-        self.upconv_01 = ConvTranspose2d(in_channels = 2*conv_out_channels_0, 
-                                            out_channels = conv_out_channels_0, 
-                                            kernel_size = upconv_kernel_size, 
-                                            stride = upconv_kernel_stride, 
+        self.upconv_01 = ConvTranspose2d(in_channels = 2*conv_out_channels_0,
+                                            out_channels = conv_out_channels_0,
+                                            kernel_size = upconv_kernel_size,
+                                            stride = upconv_kernel_stride,
                                             padding = upconv_padding)
 
-        self.upconv_11 = ConvTranspose2d(in_channels = 4*conv_out_channels_0, 
-                                            out_channels = 2*conv_out_channels_0, 
-                                            kernel_size = upconv_kernel_size, 
-                                            stride = upconv_kernel_stride, 
-                                            padding = upconv_padding) 
-
-        self.upconv_21 = ConvTranspose2d(in_channels = 8*conv_out_channels_0, 
-                                            out_channels = 4*conv_out_channels_0, 
-                                            kernel_size = upconv_kernel_size, 
-                                            stride = upconv_kernel_stride, 
-                                            padding = upconv_padding) 
-
-        self.upconv_31 = ConvTranspose2d(in_channels = 16*conv_out_channels_0, 
-                                            out_channels = 8*conv_out_channels_0, 
-                                            kernel_size = upconv_kernel_size, 
-                                            stride = upconv_kernel_stride, 
-                                            padding = upconv_padding) 
-
-
-        self.upconv_02 = ConvTranspose2d(in_channels = 2*conv_out_channels_0, 
-                                            out_channels = conv_out_channels_0, 
-                                            kernel_size = upconv_kernel_size, 
-                                            stride = upconv_kernel_stride, 
+        self.upconv_11 = ConvTranspose2d(in_channels = 4*conv_out_channels_0,
+                                            out_channels = 2*conv_out_channels_0,
+                                            kernel_size = upconv_kernel_size,
+                                            stride = upconv_kernel_stride,
                                             padding = upconv_padding)
 
-        self.upconv_12 = ConvTranspose2d(in_channels = 4*conv_out_channels_0, 
-                                            out_channels = 2*conv_out_channels_0, 
-                                            kernel_size = upconv_kernel_size, 
-                                            stride = upconv_kernel_stride, 
+        self.upconv_21 = ConvTranspose2d(in_channels = 8*conv_out_channels_0,
+                                            out_channels = 4*conv_out_channels_0,
+                                            kernel_size = upconv_kernel_size,
+                                            stride = upconv_kernel_stride,
                                             padding = upconv_padding)
-        
-        self.upconv_22 = ConvTranspose2d(in_channels = 8*conv_out_channels_0, 
-                                            out_channels = 4*conv_out_channels_0, 
-                                            kernel_size = upconv_kernel_size, 
-                                            stride = upconv_kernel_stride, 
+
+        self.upconv_31 = ConvTranspose2d(in_channels = 16*conv_out_channels_0,
+                                            out_channels = 8*conv_out_channels_0,
+                                            kernel_size = upconv_kernel_size,
+                                            stride = upconv_kernel_stride,
                                             padding = upconv_padding)
 
 
-        self.upconv_03 = ConvTranspose2d(in_channels = 2*conv_out_channels_0, 
-                                            out_channels = conv_out_channels_0, 
-                                            kernel_size = upconv_kernel_size, 
-                                            stride = upconv_kernel_stride, 
-                                            padding = upconv_padding)
-        
-        self.upconv_13 = ConvTranspose2d(in_channels = 4*conv_out_channels_0, 
-                                            out_channels = 2*conv_out_channels_0, 
-                                            kernel_size = upconv_kernel_size, 
-                                            stride = upconv_kernel_stride, 
+        self.upconv_02 = ConvTranspose2d(in_channels = 2*conv_out_channels_0,
+                                            out_channels = conv_out_channels_0,
+                                            kernel_size = upconv_kernel_size,
+                                            stride = upconv_kernel_stride,
                                             padding = upconv_padding)
 
-        
-        self.upconv_04 = ConvTranspose2d(in_channels = 2*conv_out_channels_0, 
-                                            out_channels = conv_out_channels_0, 
-                                            kernel_size = upconv_kernel_size, 
-                                            stride = upconv_kernel_stride, 
+        self.upconv_12 = ConvTranspose2d(in_channels = 4*conv_out_channels_0,
+                                            out_channels = 2*conv_out_channels_0,
+                                            kernel_size = upconv_kernel_size,
+                                            stride = upconv_kernel_stride,
                                             padding = upconv_padding)
+
+        self.upconv_22 = ConvTranspose2d(in_channels = 8*conv_out_channels_0,
+                                            out_channels = 4*conv_out_channels_0,
+                                            kernel_size = upconv_kernel_size,
+                                            stride = upconv_kernel_stride,
+                                            padding = upconv_padding)
+
+
+        self.upconv_03 = ConvTranspose2d(in_channels = 2*conv_out_channels_0,
+                                            out_channels = conv_out_channels_0,
+                                            kernel_size = upconv_kernel_size,
+                                            stride = upconv_kernel_stride,
+                                            padding = upconv_padding)
+
+        self.upconv_13 = ConvTranspose2d(in_channels = 4*conv_out_channels_0,
+                                            out_channels = 2*conv_out_channels_0,
+                                            kernel_size = upconv_kernel_size,
+                                            stride = upconv_kernel_stride,
+                                            padding = upconv_padding)
+
+
+        self.upconv_04 = ConvTranspose2d(in_channels = 2*conv_out_channels_0,
+                                            out_channels = conv_out_channels_0,
+                                            kernel_size = upconv_kernel_size,
+                                            stride = upconv_kernel_stride,
+                                            padding = upconv_padding)
+
+        self.softmax = Softmax(dim=1)
 
     def forward(self, x_img):
         out = {}
-        
+
         # Backbone
-        out_conv_00 = self.conv_00(x_img)       
-        out_conv_00 = self.activation(out_conv_00)      
-    
-        out_conv_10 = self.conv_10(out_conv_00)       
-        out_conv_10 = self.activation(out_conv_10)      
-        
-        out_conv_20 = self.conv_20(out_conv_10)       
-        out_conv_20 = self.activation(out_conv_20)      
+        out_conv_00 = self.conv_00(x_img)
+        out_conv_00 = self.activation(out_conv_00)
 
-        out_conv_30 = self.conv_30(out_conv_20)       
-        out_conv_30 = self.activation(out_conv_30)      
+        out_conv_10 = self.conv_10(out_conv_00)
+        out_conv_10 = self.activation(out_conv_10)
 
-        out_conv_40 = self.conv_40(out_conv_30)       
-        out_conv_40 = self.activation(out_conv_40)      
+        out_conv_20 = self.conv_20(out_conv_10)
+        out_conv_20 = self.activation(out_conv_20)
+
+        out_conv_30 = self.conv_30(out_conv_20)
+        out_conv_30 = self.activation(out_conv_30)
+
+        out_conv_40 = self.conv_40(out_conv_30)
+        out_conv_40 = self.activation(out_conv_40)
 
         # First layer of skip-connections
         out_upconv_01 = self.upconv_01(out_conv_10)
@@ -304,15 +305,19 @@ class Unet_pp(nn.Module):
         out = self.conv_final(out_conv_04)
 
         # Apply softmax along the channel dimension
-        sftmx = Softmax(dim=1)
-        out = sftmx(out)
+        #
+
+        # out = self.softmax(out)
+        # out = torch.argmax(out, dim=1)
+
+        # out = sftmx(out)
 
         # Apply argmax to find the class with the largest probability for each pixel.
-        #out = torch.argmax(out, dim=1)
 
         # One-hot encoding of the segmentation
         #out = one_hot(out.to(torch.int64), num_classes=9)
         #out = torch.permute(out, (0,3,1,2))
+
 
         return out
 

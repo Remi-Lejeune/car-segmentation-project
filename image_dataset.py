@@ -26,17 +26,16 @@ class ImageDataset(Dataset):
         list = np.load(self.files[idx]).astype(np.float32)
 
         # One-hot encoding of segmentation
-        # seg = torch.tensor(list[3])
-        # seg = one_hot(seg.to(torch.int64), num_classes=9)
-        # seg = torch.permute(seg, (2, 0, 1))
+        seg = torch.tensor(list[3])
+        seg = one_hot(seg.to(torch.int64), num_classes=9)
+        seg = torch.permute(seg, (2, 0, 1))
 
         # Add image and segmentation to lists
         # x.append(list[i][0:3])
-        # y.append(np.array(seg))
+        y = (np.array(seg))
+        x = list[0:3]
 
-        x = np.array(list[:3])
-        y = np.array(list[3])
-        return x, y
+        return x, list[3]
 
 
 def files_name(path='carseg_data/clean_data/*.np[yz]'):
