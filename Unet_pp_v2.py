@@ -7,6 +7,7 @@ from torch.nn import Linear, GRU, Conv2d, Dropout, MaxPool2d, BatchNorm1d, ConvT
 from torch.nn.functional import relu, elu, relu6, sigmoid, tanh, softmax, one_hot
 from torch.nn import ReLU, Sigmoid, Softmax
 import numpy as np
+import torch.nn.functional as F
 from torchvision.transforms import CenterCrop
 
     
@@ -302,9 +303,8 @@ class Unet_pp(nn.Module):
 
         # Output
         out = self.conv_final(out_conv_04)
-
         # Apply softmax along the channel dimension
-        # sftmx = Softmax(dim=1)
+        out = F.softmax(input=out, dim=1)
         # out = sftmx(out)
 
         # Apply argmax to find the class with the largest probability for each pixel.

@@ -18,7 +18,7 @@ validation_files = files[int(len(files) * 0.9):]
 test_dataset = ImageDataset(test_files, size=1)
 test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=True)
 
-model = SegmentationModel.load_from_checkpoint(checkpoint_path="epoch=2999-step=3000.ckpt")
+model = SegmentationModel.load_from_checkpoint(checkpoint_path="epoch=99-step=700.ckpt")
 
 # disable randomness, dropout, etc...
 model.eval()
