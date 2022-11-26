@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from torch.nn.functional import one_hot
 
 from segmentation_model import SegmentationModel
 import numpy as np
@@ -12,7 +13,7 @@ files = [files_name()[0]]
 test_dataset = ImageDataset(files, size=1)
 test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=True)
 
-model = SegmentationModel.load_from_checkpoint(checkpoint_path="epoch=759-step=760.ckpt")
+model = SegmentationModel.load_from_checkpoint(checkpoint_path="epoch=320-step=321.ckpt")
 #
 # # disable randomness, dropout, etc...
 model.eval()
@@ -32,6 +33,24 @@ for i in range(9):
     axs[i].imshow(y_hat[0, i], vmin=0, vmax=1)
     print(y_hat[0, i])
 plt.show()
+
+seg = torch.tensor(y)
+seg = one_hot(seg.to(torch.int64), num_classes=9)
+seg = torch.permute(seg, (0, 3, 1, 2))
+
+# Add image and segmentation to lists
+# x.append(list[i][0:3])
+y = (np.array(seg))
+
+fig, axs = plt.subplots(nrows=3, ncols=3, figsize=(18,18))
+axs = axs.flatten()
+print(y.shape)
+for i in range(9):
+    axs[i].imshow(y[0, i], vmin=0, vmax=1)
+    print(y[0, i])
+plt.show()
+
+
 # #
 # plt.figure()
 # plt.imshow((x[0][0]))
