@@ -8,6 +8,15 @@ from image_dataset import *
 from Unet_pp_v2 import Unet_pp
 import torch
 
+
+def get_masks_pred(model, x):
+    y_hat = model(x)
+    y_hat = F.one_hot(y_hat.argmax(dim=1), 9).permute(0, 3, 1, 2).float()
+    y_hat = y_hat.detach().numpy()
+    print(y_hat.shape)
+    return y_hat
+
+
 files = files_name()
 np.random.shuffle(files)
 
@@ -23,7 +32,7 @@ model = SegmentationModel.load_from_checkpoint(checkpoint_path="epoch=99-step=70
 # disable randomness, dropout, etc...
 model.eval()
 
-image = np.load("carseg_data/clean_data/0_a.npy").astype(np.float32)
+image = np.load("carseg_data/clean_data/3.npy").astype(np.float32)
 x = torch.tensor(rgb2gray(image[:3]).reshape(1, 1, 256, 256))
 print(x.shape)
 
@@ -33,12 +42,7 @@ y = torch.permute(seg, (2, 0, 1))
 y = y.detach().numpy()
 print(y.shape)
 
-y_hat = model(x)
-y_hat = F.one_hot(y_hat.argmax(dim=1), 9).permute(0, 3, 1, 2).float()
-y_hat = y_hat.detach().numpy()
-print(y_hat.shape)
-
-
+y_hat = get_masks_pred(model, x)
 
 fig, axs = plt.subplots(nrows=9, ncols=2, figsize=(12, 54))
 for i in range(9):
