@@ -34,7 +34,7 @@ y = y.detach().numpy()
 print(y.shape)
 
 y_hat = model(x)
-y_hat = F.softmax(y_hat, dim=1)
+y_hat = F.one_hot(y_hat.argmax(dim=1), 9).permute(0, 3, 1, 2).float()
 y_hat = y_hat.detach().numpy()
 print(y_hat.shape)
 
@@ -44,7 +44,7 @@ fig, axs = plt.subplots(nrows=9, ncols=2, figsize=(12, 54))
 for i in range(9):
     for j in range(2):
         if j == 0:
-            axs[i, j].imshow(y_hat[0, i],vmin=0, vmax=1, cmap='gray')
+            axs[i, j].imshow(y_hat[0, i], cmap='gray')
         else:
             axs[i, j].imshow(y[i], cmap='gray')
 plt.show()
