@@ -1,6 +1,9 @@
 from image_dataset import *
-from unet_model import UNet
+import skimage.transform as transform
+import matplotlib.pyplot as plt
+from augmentation import *
 
+from unet_model import UNet
 
 
 def rgb2gray(rgb):
@@ -10,24 +13,56 @@ def rgb2gray(rgb):
 files = files_name()
 
 
+angle = np.random.randint(0, 360)
+image = torch.from_numpy(np.load("carseg_data/clean_data/0_a.npy").astype(np.float32))
+gray_image = rgb2gray(image[:3])
+mask = image[3]
 
-image = np.load("carseg_data/clean_data/0_a.npy").astype(np.float32)
+input, output = Augmentation.similarity_transform_image(gray_image, mask)
+
+
+fig, axs = plt.subplots(nrows=1, ncols=2, figsize=(8,16))
+axs[0].imshow(input)
+axs[0].set_title("Image")
+axs[1].imshow(output)
+axs[1].set_title("Mask")
+plt.show()
+
+
+
+"""
+transformed_input = torch.from_numpy(transform.rotate(gray_image.reshape(256, 256), angle))
+transformed_output = transform.rotate(image[3].reshape(256, 256), angle)
+
+output = torch.tensor(transformed_output)
+masks = F.one_hot(output.to(torch.int64), num_classes=9)
+y = torch.permute(masks, (2, 0, 1))
+y = y.detach().numpy()
+
+
+fig, axs = plt.subplots(nrows=3, ncols=3)
+axs = axs.flatten()
+
+
+for i in range(y.shape[0]):
+    axs[i].imshow(y[i])
+    axs[i].set_title(f"Mask {i+1}")
+plt.tight_layout()
+plt.show()
+
+print(angle)
+net = UNet(n_channels=1, n_classes=9)
+out = net(transformed_input.reshape(1, 1, 256, 256))
+
+
 x = torch.tensor(image[:3].reshape(1, 3, 256, 256))
 model = UNet(n_channels=3, n_classes=9)
 y_hat = model(x)
 print(y_hat.shape)
-
-
-
-
-
-#images_files = photos_file_name()
-#files = get_npy_filenames(photos_file_name())
-
-
-
-#plt.imshow(rgb2gray(image), cmap='gray')
-#plt.show()
-
+images_files = photos_file_name()
+files = get_npy_filenames(photos_file_name())
+plt.imshow(rgb2gray(image), cmap='gray')
+plt.show()
+"""
 
 
