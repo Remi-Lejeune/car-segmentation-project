@@ -10,19 +10,20 @@ from DataAugmentation import DataAugmentation
 
 #files = files_name()
 files = get_npy_filenames(photos_file_name())
+files = files + get_npy_filenames(photos_file_name("carseg_data/carseg_raw_data/train/cycleGAN/*.jpg"))
 np.random.shuffle(files)
 
-train_files = files[:int(len(files) * 0.5)]
-test_files = files[int(len(files) * 0.5): int(len(files) * 0.75)]
-validation_files = files[int(len(files) * 0.75):]
+train_files = files[:int(len(files) * 0.8)]
+test_files = files[int(len(files) * 0.8): int(len(files) * 0.9)]
+validation_files = files[int(len(files) * 0.9):]
 
 train_dataset = ImageDataset(train_files)
 test_dataset = ImageDataset(test_files)
 validation_dataset = ImageDataset(validation_files)
 
-train_dataloader = DataLoader(train_dataset, batch_size=16, shuffle=True)
-test_dataloader = DataLoader(test_dataset, batch_size=8, shuffle=False)
-validation_dataloader = DataLoader(validation_dataset, batch_size=8, shuffle=False)
+train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=False)
+validation_dataloader = DataLoader(validation_dataset, batch_size=32, shuffle=False)
 
 
 model = SegmentationModel()
@@ -30,7 +31,7 @@ model = SegmentationModel()
 trainer = Trainer(
     accelerator="gpu",
     devices=1,
-    max_epochs=500,
+    max_epochs=1000,
     min_epochs=50,
 )
 
