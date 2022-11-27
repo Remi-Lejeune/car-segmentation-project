@@ -14,15 +14,16 @@ files = files_name()
 
 
 angle = np.random.randint(0, 360)
-image = torch.from_numpy(np.load("carseg_data/clean_data/0_a.npy").astype(np.float32))
+image = torch.from_numpy(np.load("carseg_data/clean_data/31.npy").astype(np.float32))
 gray_image = rgb2gray(image[:3])
 mask = image[3]
+transf_matrix = transform.SimilarityTransform(scale=2)
+input = transform.warp(gray_image, transf_matrix)
+output = transform.warp(mask, transf_matrix)
 
-input, output = Augmentation.similarity_transform_image(gray_image, mask)
 
-
-fig, axs = plt.subplots(nrows=1, ncols=2, figsize=(8,16))
-axs[0].imshow(input)
+fig, axs = plt.subplots(nrows=1, ncols=2, figsize=(8, 16))
+axs[0].imshow(input.reshape(256, 256))
 axs[0].set_title("Image")
 axs[1].imshow(output)
 axs[1].set_title("Mask")

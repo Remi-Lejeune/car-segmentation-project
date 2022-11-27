@@ -27,12 +27,12 @@ validation_files = files[int(len(files) * 0.9):]
 test_dataset = ImageDataset(test_files, size=1)
 test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=True)
 
-model = SegmentationModel.load_from_checkpoint(checkpoint_path="epoch=99-step=13600.ckpt")
+model = SegmentationModel.load_from_checkpoint(checkpoint_path="epoch=499-step=3000.ckpt")
 
 # disable randomness, dropout, etc...
 model.eval()
 
-image = np.load("carseg_data/clean_data/1303.npy").astype(np.float32)
+image = np.load("carseg_data/clean_data/209.npy").astype(np.float32)
 x = torch.tensor(rgb2gray(image[:3]).reshape(1, 1, 256, 256))
 print(x.shape)
 

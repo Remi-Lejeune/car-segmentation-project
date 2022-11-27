@@ -21,8 +21,8 @@ test_dataset = ImageDataset(test_files)
 validation_dataset = ImageDataset(validation_files)
 
 train_dataloader = DataLoader(train_dataset, batch_size=16, shuffle=True)
-test_dataloader = DataLoader(test_dataset, batch_size=16, shuffle=False)
-validation_dataloader = DataLoader(validation_dataset, batch_size=16, shuffle=False)
+test_dataloader = DataLoader(test_dataset, batch_size=8, shuffle=False)
+validation_dataloader = DataLoader(validation_dataset, batch_size=8, shuffle=False)
 
 
 model = SegmentationModel()
@@ -30,8 +30,8 @@ model = SegmentationModel()
 trainer = Trainer(
     accelerator="gpu",
     devices=1,
-    max_epochs=5,
-    min_epochs=1,
+    max_epochs=500,
+    min_epochs=50,
 )
 
 trainer.fit(model, train_dataloader, validation_dataloader)
