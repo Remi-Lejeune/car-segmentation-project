@@ -7,13 +7,12 @@ from segmentation_model import SegmentationModel
 
 
 #files = files_name()
-files = get_npy_filenames(photos_file_name())
-files = files + get_npy_filenames(photos_file_name("carseg_data/carseg_raw_data/train/cycleGAN/*.jpg"))
-np.random.shuffle(files)
+clean_files = get_clean_files()
+test_files = get_test_files()
+np.random.shuffle(clean_files)
 
-train_files = files[:int(len(files) * 0.8)]
-test_files = files[int(len(files) * 0.8): int(len(files) * 0.9)]
-validation_files = files[int(len(files) * 0.9):]
+train_files = clean_files[:int(len(clean_files) * 0.9)]
+validation_files = clean_files[int(len(clean_files) * 0.9):]
 
 train_dataset = ImageDataset(train_files)
 test_dataset = ImageDataset(test_files)
