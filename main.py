@@ -7,6 +7,8 @@ from segmentation_model import SegmentationModel
 from Unet_pp_v2 import Unet_pp
 from DataAugmentation import DataAugmentation
 import sklearn
+#from Unet_v2 import *
+from unet_model import UNet
 
 files = files_name()
 np.random.shuffle(files)
@@ -20,15 +22,13 @@ test_dataset = ImageDataset(test_files)
 validation_dataset = ImageDataset(validation_files)
 
 # Augment the training and validation data
-train_dataset = DataAugmentation(train_dataset)
-validation_dataset = DataAugmentation(validation_dataset)
+#train_dataset = DataAugmentation(train_dataset)
+#validation_dataset = DataAugmentation(validation_dataset)
 
 
 train_dataloader = DataLoader(train_dataset, batch_size=16, shuffle=True)
 test_dataloader = DataLoader(test_dataset, batch_size=16, shuffle=True)
 validation_dataloader = DataLoader(validation_dataset, batch_size=16, shuffle=True)
-
-
 
 
 # Compute class weight from the trianing data.
@@ -51,7 +51,7 @@ weights = torch.from_numpy(weights)
 model = SegmentationModel(weights=weights)
 
 trainer = Trainer(
-    accelerator="gpu",
+    accelerator="cpu",
     devices=1,
     max_epochs=10,
     min_epochs=5,

@@ -36,7 +36,9 @@ class ImageDataset(Dataset):
 
         # Grayscale the images
         x = np.array(list[:3])
-        x = np.dot(x[...,:3], [0.2989, 0.5870, 0.1140])
+        #x = np.dot(x[...,:3], [0.2989, 0.5870, 0.1140])
+        x = np.transpose(x, axes = [1,2,0])
+        x = np.dot(x, [0.2989, 0.5870, 0.1140])
 
         y = np.array(seg)
         return x, y
@@ -44,5 +46,9 @@ class ImageDataset(Dataset):
     def __append__(self, new):
         self.files.append(new)
 
-def files_name(path='clean_data/*.np[yz]'):
+#def files_name(path='carseg_data/clean_data/*.np[yz]'):
+#    return glob.glob(path)
+
+
+def files_name(path='../../../../Desktop/clean_data/*.np[yz]'):
     return glob.glob(path)

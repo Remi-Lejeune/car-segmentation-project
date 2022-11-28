@@ -4,13 +4,19 @@ from torch import nn
 from torch.nn.functional import cross_entropy
 import numpy as np
 
-from Unet_pp_v2 import Unet_pp
+#from Unet_pp_v2 import Unet_pp
+#from Unet import Net
+#from Unet_v2 import *
 
+from unet_model import UNet
 
 class SegmentationModel(pl.LightningModule):
     def __init__(self,weights):
         super().__init__()
-        self.network = Unet_pp(256, 256, 3, 9)
+        #self.network = Unet_pp(256, 256, 3, 9)
+        #self.network = Unet(256, 256, 1, 9)
+
+        self.network = UNet(n_channels=1, n_classes=9)
         self.loss = nn.CrossEntropyLoss(weight=weights)
 
         self.apply(self._init_weights)

@@ -7,9 +7,6 @@ from image_dataset import ImageDataset, files_name
 from Unet_pp_v2 import Unet_pp
 import torch
 
-import os
-os.environ['KMP_DUPLICATE_LIB_OK']='True'
-
 
 files = files_name()
 np.random.shuffle(files)

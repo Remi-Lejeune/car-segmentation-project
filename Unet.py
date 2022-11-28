@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.nn import Linear, GRU, Conv2d, Dropout, MaxPool2d, BatchNorm1d, ConvTranspose2d
 from torch.nn.functional import relu, elu, relu6, sigmoid, tanh, softmax
-from torch.nn import ReLU, Sigmoid
+from torch.nn import ReLU, Sigmoid, Softmax
 import numpy as np
 from torchvision.transforms import CenterCrop
 
@@ -14,7 +14,7 @@ class Net(nn.Module):
     def __init__(self, im_height, im_width, im_channels, num_features, activationFun="Relu", maxpool_kernel_size=2, 
                 maxpool_kernel_stride=2, conv_kernel_size = 3, conv_kernel_stride=1, conv_padding=0, conv_dilation=1, 
                 conv_out_channels_0 = 64, upconv_kernel_size=2, upconv_kernel_stride=1, upconv_padding=0):
-        #super(Net, self).__init__()
+        super(Net, self).__init__()
 
         if activationFun=="Relu":
             self.activation = ReLU()
@@ -158,9 +158,12 @@ class Net(nn.Module):
                                 padding = conv_padding)  # Output size from this layer (166, 166, num_features)
 
         
-    def forward(self, x_img, x_margin, x_shape, x_texture):
+    def forward(self, x_img):
         out = {}
         
+        print("Data type of input: ", x_img.dtype)
+        print("Shape of input: ", x_img.shape)
+
         # First set of  convolutional layers 
         out_conv_1 = self.conv_11(x_img)        # Output size from this layer (254, 254, 64)
         out_conv_1 = self.activation(out_conv_1)      
@@ -237,10 +240,14 @@ class Net(nn.Module):
         out_conv_7 = self.conv_72(out_conv_7)    # Output size from this layer (166, 166, 64)
         out_conv_7 = self.activation(out_conv_7)
 
-        out_conv_7 = self.conv_73(out_conv_7)    # Output size from this layer (166, 166, 2)
+        out_conv_7 = self.conv_73(out_conv_7)   
+
+        # Apply softmax along the channel dimension
+        sftmx = Softmax(dim=1)
+        out = sftmx(out)
 
         out = out_conv_7
 
         return out
 
-net = Net()
+#net = Net()
