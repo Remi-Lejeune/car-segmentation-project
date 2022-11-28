@@ -2,36 +2,47 @@ import random
 import torchvision.transforms.functional as TF
 from torchvision import transforms 
 import torch
+import numpy as np
 
-def DataAugmentation(data, pflip=0.2, pcrop=0.2, min_crop_sz=200, prot=0.2, max_rot_ang=30):
+def flip_im(input, output, pflip=0.2):
     # Randomly flip images horizontally
-    im_num = len(data)
-    for i in range(im_num):
-        im = torch.from_numpy(data[i][0])
-        seg = torch.from_numpy(data[i][1])
-        if i == 0:
-            print(seg)
 
-        if random.random() < pflip:
-            trans_im = TF.hflip(im)
-            trans_seg = TF.hflip(seg)
-            data.__append__(trans_im)
+    im = torch.from_numpy(np.transpose(input, (2,0,1)))
+    seg = torch.from_numpy(output)
 
-    # Crop images at random
-    im_num = len(data)
-    for i in range(im_num):
-        if random.random() < pcrop:
-            crop_sz = random.uniform(a=min_crop_sz, b=data.shape[2])
-            cropper = TF.RandomResizedCrop(size=(crop_sz, crop_sz))
-            trans_im = cropper(data[i])
-            data.append(trans_im)
+    trans_im = TF.hflip(im)
+    trans_seg = TF.hflip(seg)
 
-    # Rotate images at random
-    im_num = len(data)
-    for i in range(im_num):
-        if random.random() < prot:
-            angle = random.uniform(a=-max_rot_ang, b=max_rot_ang)
-            trans_im = TF.rotate(data[i], angle=angle)
-            data.append(trans_im)
+    trans_im = np.transpose(trans_im.numpy(),(1,2,0))
+    trans_seg = trans_seg.numpy()
+    
+    return trans_im, trans_seg
 
-    return data
+
+
+def zoom_im(input, output, min_crop_sz=150, pzoom=0.2):
+    # Zoom in on the images randomly and rescale to the original size
+
+    # Convert numpy arrays to tensors.
+    im = torch.from_numpy(np.transpose(input, (2,0,1)))
+    seg = torch.from_numpy(output)
+    seg = torch.reshape(seg, (1, 256, 256))
+
+    crop_sz = int(random.uniform(a=min_crop_sz, b=im.shape[1]))
+
+    # Apply center crop and resize to the original size
+    trans_im = transforms.CenterCrop(size=crop_sz)(im)
+    trans_im = transforms.Resize(size=im.shape[1])(trans_im)
+    trans_seg = transforms.CenterCrop(size=crop_sz)(seg)
+    trans_seg = transforms.Resize(size=im.shape[1])(trans_seg)
+
+    # Convert back to numpy arrays
+    trans_im = np.transpose(trans_im.numpy(),(1,2,0))
+    trans_seg = torch.squeeze(trans_seg)
+    trans_seg = trans_seg.numpy()
+
+    return trans_im, trans_seg
+
+
+
+
