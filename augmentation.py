@@ -12,13 +12,13 @@ def rotate_image(input, output, H=256, W=256, angle=None):
     It requires gray-scaled images as input
     :param input: the input gray-scaled image
     :param output: mask containing all the features
-    :return: the rotated input and output with shape (H, W)
+    :return: the rotated input and output with shape (N_CHANNELS, H, W)
     """
     if angle is None:
         angle = random.randint(-90, 90)
-    transf_input = transform.rotate(input.reshape(H, W), angle)
+    transf_input = transform.rotate(np.transpose(input, (1, 2, 0)), angle)
     transf_output = transform.rotate(output.reshape(H, W), angle)
-    return transf_input, transf_output
+    return np.transpose(transf_input, (2, 0, 1)), transf_output
 
 
 def similarity_transform_image(input, output, H=256, W=256, point=None):
@@ -28,7 +28,7 @@ def similarity_transform_image(input, output, H=256, W=256, point=None):
     :param output: mask containing all the features
     :param H: height of the image
     :param W: width of the image
-    :return: the transformed input and output with shape (H, W)
+    :return: the transformed input and output with shape (N_CHANNELS, H, W)
     """
     if point is None:
         ax_0 = np.random.randint(-H/4, H/4)
@@ -37,9 +37,9 @@ def similarity_transform_image(input, output, H=256, W=256, point=None):
         ax_0 = point[0]
         ax_1 = point[1]
     transf_matrix = transform.SimilarityTransform(translation=(ax_0, ax_1))
-    transf_input = transform.warp(input.reshape(H, W), transf_matrix)
+    transf_input = transform.warp(np.transpose(input, (1, 2, 0)), transf_matrix)
     transf_output = transform.warp(output.reshape(H, W), transf_matrix)
-    return transf_input, transf_output
+    return np.transpose(transf_input, (2, 0, 1)), transf_output
 
 
 def flip_im(input, output):
@@ -47,7 +47,7 @@ def flip_im(input, output):
     Flip the input image and the corresponding mask
     :param input: image with shape (n_channels, H, W)
     :param output: image with shape (H, W)
-    :return: the transformed input and output
+    :return: the transformed input and output with shape (N_CHANNELS, H, W)
     """
     # Randomly flip images horizontally
     im = torch.from_numpy(input)
@@ -64,7 +64,7 @@ def zoom_im(input, output, min_crop_sz=150):
     Zoom in the input image and the corresponding mask
     :param input: image with shape (n_channels, H, W)
     :param output: image with shape (H, W)
-    :return: the transformed input and output
+    :return: the transformed input and output with shape (N_CHANNELS, H, W)
     """
     # Zoom in on the images randomly and rescale to the original size
     n_channels = input.shape[0]

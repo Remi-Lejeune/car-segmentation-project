@@ -16,15 +16,19 @@ def rgb2gray(rgb):
     r, g, b = rgb[0, :, :], rgb[1, :, :], rgb[2, :, :]
     gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
     return gray.reshape(1, rgb.shape[1], rgb.shape[2])
-files = files_name()
 
 
-angle = np.random.randint(0, 360)
 image = np.load("carseg_data/clean_data/31.npy").astype(np.float32)
+gray_scaled_img = rgb2gray(image[:3])
 
-input, output = zoom_im(image[:3], image[3])
+# Apply the augmentation function
+input, output = flip_im(gray_scaled_img, image[3])
+
+# Check sizes
+print(f"Input shape = {input.shape}, Output shape = {output.shape}")
+
+# Show the results
 plot_transformed_img(np.transpose(input, (1, 2, 0)), output)
-plot_transformed_img(np.transpose(flip_im(input, output)[0], (1, 2, 0)), flip_im(input, output)[1])
 
 
 
