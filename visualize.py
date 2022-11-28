@@ -62,13 +62,9 @@ def apply(x, masks):
     masks_copy = masks.copy()
 
     for mask in masks_copy[1:]:
-        edge_sobel = filters.sobel(mask)
-        edge_sobel = np.where(edge_sobel > 0.5, True, False)
         mask = np.where(mask > 0.5, 1, 0)
         for i in range(3):
             image[:, :, i] = image[:, :, i] + mask * np.random.uniform(-0.8, 0.8)
-            # image[:, :, i] = np.minimum(1, image[:, :, i] + mask * np.random.uniform(0.2, 0.8))
-            # image[:, :, i][edge_sobel] = 0
             image[:, :, i][np.where(image[:, :, i] > 1)] = 1
 
     return image
