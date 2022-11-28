@@ -49,7 +49,7 @@ class ImageDataset(Dataset):
         output_mask = output_mask.reshape(256, 256)
         masks = get_output_masks(output_mask)'''
 
-        return image[:3], image[3]
+        return image[:3], get_output_masks(image[3])
 
 
 def files_name(path='carseg_data/clean_data/*.np[yz]'):
