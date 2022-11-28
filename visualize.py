@@ -14,7 +14,7 @@ def get_masks_pred(model, x):
     y_hat = F.one_hot(y_hat.argmax(dim=1), 9).permute(0, 3, 1, 2).float()
     y_hat = y_hat.detach().numpy()
     print(y_hat.shape)
-    return y_hat
+    return y_hat.astype(int)
 
 
 files = files_name()
@@ -27,12 +27,12 @@ validation_files = files[int(len(files) * 0.9):]
 test_dataset = ImageDataset(test_files, size=1)
 test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=True)
 
-model = SegmentationModel.load_from_checkpoint(checkpoint_path="epoch=499-step=3000.ckpt")
+model = SegmentationModel.load_from_checkpoint(checkpoint_path="epoch=999-step=31000.ckpt")
 
 # disable randomness, dropout, etc...
 model.eval()
 
-image = np.load("carseg_data/clean_data/209.npy").astype(np.float32)
+image = np.load("carseg_data/clean_data/21_a.npy").astype(np.float32)
 x = torch.tensor(rgb2gray(image[:3]).reshape(1, 1, 256, 256))
 print(x.shape)
 
@@ -44,11 +44,17 @@ print(y.shape)
 
 y_hat = get_masks_pred(model, x)
 
-fig, axs = plt.subplots(nrows=9, ncols=2, figsize=(12, 54))
+from matplotlib.colors import ListedColormap
+import seaborn as sns
+
+fig, axs = plt.subplots(nrows=9, ncols=3, figsize=(12, 54))
 for i in range(9):
-    for j in range(2):
-        if j == 0:
-            axs[i, j].imshow(y_hat[0, i], cmap='gray')
-        else:
-            axs[i, j].imshow(y[i], cmap='gray')
+    axs[i, 0].imshow(y_hat[0, i], cmap='gray')
+    axs[i, 0].set_title(f"Y_hat {i}")
+    axs[i, 1].imshow(y[i], cmap='gray')
+    axs[i, 1].set_title(f"Y {i}")
+    pos_neg = axs[i, 2].imshow(y_hat[0, i]-y[i], vmin=-1, vmax=1, cmap='RdBu', interpolation=None)
+    axs[i, 2].set_title(f"Y_hat_{i} - Y_{i}")
+    cbar = fig.colorbar(pos_neg, ax=axs[i, 2], extend=None)
+plt.tight_layout()
 plt.show()
