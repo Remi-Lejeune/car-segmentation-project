@@ -20,11 +20,15 @@ class DiceLoss(nn.Module):
         """
         dims = (1, 2, 3)
 
-        if self.weights is not None:
-            for i in range(len(self.weights)):
-                input[i] = input[i] * self.weights[i]
+        # if self.weights is not None:
+        #     for i in range(len(self.weights)):
+        #         input[i] = input[i] * self.weights[i]
 
-        intersection = torch.sum(input * target_one_hot, dims)
-        cardinality = torch.sum(input + target_one_hot, dims)
+        intersection = torch.sum(input * target_one_hot, (2,3))
+
+        cardinality = torch.sum(input + target_one_hot, (2,3))
         dice_score = 2. * intersection / (cardinality + self.eps)
-        return torch.mean(1. - dice_score)
+
+        loss = torch.mean(1. - dice_score, 0)
+
+        return torch.dot(loss.float(), self.weights.float())
