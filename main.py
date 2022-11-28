@@ -43,7 +43,7 @@ weights = torch.from_numpy(weights)
 
 
 
-model = SegmentationModel(weights=weights)
+model = SegmentationModel()
 
 trainer = Trainer(
     accelerator="gpu",
