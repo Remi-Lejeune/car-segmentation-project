@@ -35,7 +35,7 @@ class SegmentationModel(pl.LightningModule):
         y_hat = self.network(x).float()
         loss = self.dice_loss(F.softmax(y_hat, dim=1).float(), y.float()) + CrossEntropyLoss(y_hat.float(), y.float())
 
-        self.log("validation_loss", loss)
+        self.log("validation test score", loss)
         return loss
 
     def configure_optimizers(self):
