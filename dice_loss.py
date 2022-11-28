@@ -7,7 +7,7 @@ class DiceLoss(nn.Module):
     This module implements the Dice loss function used to train the model
     """
     def __init__(self, weights=None) -> None:
-        super(DiceLoss, self).__init__()
+        super().__init__()
         self.eps: float = 1e-6
         self.weights = weights
 
@@ -31,4 +31,4 @@ class DiceLoss(nn.Module):
 
         loss = torch.mean(1. - dice_score, 0)
 
-        return torch.dot(loss.float(), self.weights.float())
+        return torch.dot(loss.float().cpu(), self.weights.float().cpu())
