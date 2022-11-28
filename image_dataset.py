@@ -4,7 +4,7 @@ from torch.utils.data import Dataset
 from torch.nn.functional import one_hot
 import torch
 import os
-from augmentation import Augmentation
+from augmentation import *
 
 
 def get_transformed_items(input, output):
@@ -12,9 +12,9 @@ def get_transformed_items(input, output):
     if prob == 0:
         return input, output
     if prob == 1:
-        return Augmentation.rotate_image(input, output)
+        return rotate_image(input, output)
     if prob == 2:
-        return Augmentation.similarity_transform_image(input, output)
+        return similarity_transform_image(input, output)
 
 
 def get_output_masks(output):

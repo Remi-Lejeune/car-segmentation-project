@@ -28,20 +28,18 @@ validation_dataloader = DataLoader(validation_dataset, batch_size=32, shuffle=Fa
 
 # Compute class weight from the trianing data.
 it = iter(train_dataloader)
-weights=np.zeros(9)
-for  batch_im, batch_label in it:
+weights = np.zeros(9)
+for batch_im, batch_label in it:
 
     for i in range(batch_label.size()[0]):
-        label = batch_label[i,:,:,:]
+        label = batch_label[i, :, :, :]
 
-        total_pixels = torch.sum(label, dim=(1,2)).numpy()
+        total_pixels = torch.sum(label, dim=(1, 2)).numpy()
         total_pixels[total_pixels == 0] += 1
         weights += label.size()[1] / (9*total_pixels)
 
-weights=weights/len(train_dataset.files)
+weights = weights/len(train_dataset.files)
 weights = torch.from_numpy(weights)
-
-
 
 model = SegmentationModel()
 
