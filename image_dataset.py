@@ -40,15 +40,16 @@ class ImageDataset(Dataset):
 
     def __getitem__(self, idx):
         image = np.load(self.files[idx]).astype(np.float32)
-        # Gray-scaling the input of shape = (1, 256, 256)
+        '''# Gray-scaling the input of shape = (1, 256, 256)
         x = rgb2gray(image[:3])
         # features map of shape (1, 256, 256)
         y = image[3]
         input_img, output_mask = get_transformed_items(x, y)
         input_img = input_img.reshape(1, 256, 256)
         output_mask = output_mask.reshape(256, 256)
-        masks = get_output_masks(output_mask)
-        return input_img, masks
+        masks = get_output_masks(output_mask)'''
+
+        return image[:3], image[3]
 
 
 def files_name(path='carseg_data/clean_data/*.np[yz]'):

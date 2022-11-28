@@ -18,9 +18,9 @@ train_dataset = ImageDataset(train_files)
 test_dataset = ImageDataset(test_files)
 validation_dataset = ImageDataset(validation_files)
 
-train_dataloader = DataLoader(train_dataset, batch_size=32, shuffle=True)
-test_dataloader = DataLoader(test_dataset, batch_size=32, shuffle=False)
-validation_dataloader = DataLoader(validation_dataset, batch_size=32, shuffle=False)
+train_dataloader = DataLoader(train_dataset, batch_size=16, shuffle=True)
+test_dataloader = DataLoader(test_dataset, batch_size=16, shuffle=False)
+validation_dataloader = DataLoader(validation_dataset, batch_size=16, shuffle=False)
 
 
 
@@ -43,7 +43,7 @@ weights = torch.from_numpy(weights)
 model = SegmentationModel()
 
 trainer = Trainer(
-    accelerator="gpu",
+    accelerator="cpu",
     devices=1,
     max_epochs=1000,
     min_epochs=50,
