@@ -39,7 +39,7 @@ class SegmentationModel(pl.LightningModule):
         return loss
 
     def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), lr=1e-5)
+        return torch.optim.Adam(self.parameters(), lr=1e-3)
 
     def forward(self, x):
         return self.network.forward(x)

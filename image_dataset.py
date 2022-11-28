@@ -55,6 +55,21 @@ def files_name(path='carseg_data/clean_data/*.np[yz]'):
     return glob.glob(path)
 
 
+# function that outputs all files with a number and numpy extension
+def get_files(path='carseg_data/clean_data/'):
+    return glob.glob(path + "[0-9]*.np[yz]")
+
+
+def get_clean_files(path='carseg_data/clean_data/'):
+    files = get_files(path)
+    files_a = get_test_files(path)
+    return np.setdiff1d(files, files_a)
+
+
+def get_test_files(path='carseg_data/clean_data/'):
+    return glob.glob(path + "[0-9]*a.np[yz]")
+
+
 def photos_file_name(path='carseg_data/carseg_raw_data/train/photo/*.jpg'):
     list = [os.path.normpath(i) for i in glob.glob(path)]
     return list
@@ -65,7 +80,7 @@ def get_npy_filenames(photos_file_names):
     for file_name in photos_file_names:
         image_file = file_name.split("/")[-1]
         image_name = image_file.split('.')[0]
-        path_list = glob.glob("carseg_data/clean_data/"+image_name+".npy")
+        path_list = glob.glob("carseg_data/clean_data/" + image_name + ".npy")
         clean_data_filenames.append(path_list[0])
     return clean_data_filenames
 
@@ -74,7 +89,3 @@ def rgb2gray(rgb):
     r, g, b = rgb[0, :, :], rgb[1, :, :], rgb[2, :, :]
     gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
     return gray.reshape(1, rgb.shape[1], rgb.shape[2])
-
-
-
-
