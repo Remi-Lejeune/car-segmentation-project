@@ -10,12 +10,12 @@ from DataAugmentation import DataAugmentation
 
 
 
-files = [files_name()[0]]
-# np.random.shuffle(files)
-#
-# train_files = files[: int(len(files) * 0.8)]
-# test_files = files[int(len(files) * 0.8): int(len(files) * 0.9)]
-# validation_files = files[int(len(files) * 0.9):]
+files = files_name()
+np.random.shuffle(files)
+
+train_files = files[: int(len(files) * 0.8)]
+test_files = files[int(len(files) * 0.8): int(len(files) * 0.9)]
+validation_files = files[int(len(files) * 0.9):]
 
 train_dataset = ImageDataset(files)
 test_dataset = ImageDataset(files)
@@ -25,9 +25,9 @@ validation_dataset = ImageDataset(files)
 # train_dataset = DataAugmentation(train_dataset)
 # validation_dataset = DataAugmentation(validation_dataset)
 
-train_dataloader = DataLoader(train_dataset, batch_size=1, shuffle=True)
-test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=True)
-validation_dataloader = DataLoader(validation_dataset, batch_size=1, shuffle=True)
+train_dataloader = DataLoader(train_dataset, batch_size=16, shuffle=True)
+test_dataloader = DataLoader(test_dataset, batch_size=16, shuffle=True)
+validation_dataloader = DataLoader(validation_dataset, batch_size=16, shuffle=True)
 
 
 model = SegmentationModel()
@@ -35,7 +35,7 @@ model = SegmentationModel()
 trainer = Trainer(
     accelerator="gpu",
     devices=1,
-    max_epochs=10000,
+    max_epochs=200,
     min_epochs=5,
 )
 

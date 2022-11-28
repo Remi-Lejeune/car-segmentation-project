@@ -4,6 +4,7 @@ from torch import nn
 from torch.nn.functional import cross_entropy
 from unet_test import UNet
 
+
 class SegmentationModel(pl.LightningModule):
     def __init__(self):
         super().__init__()
@@ -29,10 +30,6 @@ class SegmentationModel(pl.LightningModule):
     def helper(self, batch, batch_idx, mode):
         x, y = batch
         x_hat = self.network(x)
-        # x_hat = x_hat.permute(0, 2, 3, 1).contiguous().view(-1, x_hat.size(1))
-        # y = y.permute(1, 2, 0).contiguous().view(-1).long()
-        # print(x_hat.shape)
-        # print(y.shape)
 
         loss = self.loss(x_hat.float(), y.long())
         self.log(mode, loss)
