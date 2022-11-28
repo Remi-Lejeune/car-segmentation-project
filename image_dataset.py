@@ -57,16 +57,15 @@ def files_name(path='carseg_data/clean_data/*.np[yz]'):
 
 
 # function that outputs all files with a number and numpy extension
-def get_files(path='carseg_data/clean_data/[0-9]*.npy'):
+def get_test_files():
     
-    all_item = glob.glob(path)
-    
+
     exclude = ["carseg_data/clean_data\\0_a.npy","carseg_data/clean_data\\1_a.npy","carseg_data/clean_data\\2_a.npy","carseg_data/clean_data\\3_a.npy","carseg_data/clean_data\\5_a.npy","carseg_data/clean_data\\6_a.npy","carseg_data/clean_data\\10_a.npy","carseg_data/clean_data\\11_a.npy","carseg_data/clean_data\\12_a.npy","carseg_data/clean_data\\19_a.npy","carseg_data/clean_data\\20_a.npy",
                 "carseg_data/clean_data\\21_a.npy","carseg_data/clean_data\\22_a.npy","carseg_data/clean_data\\24_a.npy","carseg_data/clean_data\\26_a.npy","carseg_data/clean_data\\28_a.npy","carseg_data/clean_data\\29_a.npy","carseg_data/clean_data\\32_a.npy","carseg_data/clean_data\\33_a.npy","carseg_data/clean_data\\35_a.npy",
                 "carseg_data/clean_data\\36_a.npy","carseg_data/clean_data\\39_a.npy","carseg_data/clean_data\\40_a.npy","carseg_data/clean_data\\43_a.npy","carseg_data/clean_data\\45_a.npy","carseg_data/clean_data\\46_a.npy","carseg_data/clean_data\\47_a.npy","carseg_data/clean_data\\50_a.npy","carseg_data/clean_data\\51_a.npy","carseg_data/clean_data\\52_a.npy"
                 ]
     
-    include = list(set(all_item)-set(exclude))
+    include = (exclude)
     
     return include
 
@@ -74,12 +73,12 @@ def get_files(path='carseg_data/clean_data/[0-9]*.npy'):
 
 def get_clean_files(path='carseg_data/clean_data/'):
     files = get_files(path)
-    files_a = get_test_files(path)
+    files_a = get_test_files()
     return np.setdiff1d(files, files_a)
 
 
-def get_test_files(path='carseg_data/clean_data/'):
-    return glob.glob(path + "[0-9]*a.np[yz]")
+def get_files(path='carseg_data/clean_data/'):
+    return glob.glob(path + "[0-9]*.np[yz]")
 
 
 def photos_file_name(path='carseg_data/carseg_raw_data/train/photo/*.jpg'):
