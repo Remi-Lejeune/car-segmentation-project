@@ -5,7 +5,6 @@ from torch.utils.data import DataLoader
 from image_dataset import ImageDataset, files_name
 import torch.nn.functional as F
 from image_dataset import *
-from Unet_pp_v2 import Unet_pp
 import torch
 
 

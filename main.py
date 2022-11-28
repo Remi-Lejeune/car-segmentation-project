@@ -4,8 +4,6 @@ from pytorch_lightning import Trainer
 from torch.utils.data import DataLoader
 from image_dataset import *
 from segmentation_model import SegmentationModel
-from Unet_pp_v2 import Unet_pp
-from DataAugmentation import DataAugmentation
 
 
 #files = files_name()

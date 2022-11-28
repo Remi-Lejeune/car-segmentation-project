@@ -5,7 +5,6 @@ from segmentation_model import SegmentationModel
 import numpy as np
 from torch.utils.data import DataLoader
 from image_dataset import ImageDataset, files_name
-from Unet_pp_v2 import Unet_pp
 import torch
 from skimage import filters
 
