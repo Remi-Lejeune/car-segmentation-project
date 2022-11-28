@@ -6,9 +6,10 @@ class DiceLoss(nn.Module):
     """
     This module implements the Dice loss function used to train the model
     """
-    def __init__(self) -> None:
+    def __init__(self, weights) -> None:
         super(DiceLoss, self).__init__()
         self.eps: float = 1e-6
+        self.weights = weights
 
     def forward(self, input: torch.Tensor, target_one_hot: torch.Tensor) -> torch.Tensor:
         """
@@ -18,6 +19,11 @@ class DiceLoss(nn.Module):
         :return: the computed value of the Dice Loss
         """
         dims = (1, 2, 3)
+
+        if self.weights is not None:
+            for i in range(len(self.weights)):
+                input[i] = input[i] * self.weights[i]
+
         intersection = torch.sum(input * target_one_hot, dims)
         cardinality = torch.sum(input + target_one_hot, dims)
         dice_score = 2. * intersection / (cardinality + self.eps)

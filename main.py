@@ -40,7 +40,7 @@ for batch_im, batch_label in it:
 weights = weights/len(train_dataset.files)
 weights = torch.from_numpy(weights)
 
-model = SegmentationModel()
+model = SegmentationModel(weights)
 
 trainer = Trainer(
     accelerator="cpu",
