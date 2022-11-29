@@ -9,7 +9,7 @@ class DiceLoss(nn.Module):
     def __init__(self, weights=None) -> None:
         super().__init__()
         self.eps: float = 1e-6
-        self.weights = weights
+        self.register_buffer("weights", weights)
 
     def forward(self, input: torch.Tensor, target_one_hot: torch.Tensor) -> torch.Tensor:
         """
@@ -18,17 +18,17 @@ class DiceLoss(nn.Module):
         :param target_one_hot: output masks of shape (n_classes, height, width)
         :return: the computed value of the Dice Loss
         """
-        dims = (1, 2, 3)
 
-        # if self.weights is not None:
-        #     for i in range(len(self.weights)):
-        #         input[i] = input[i] * self.weights[i]
-
-        intersection = torch.sum(input * target_one_hot, (2,3))
-
-        cardinality = torch.sum(input + target_one_hot, (2,3))
-        dice_score = 2. * intersection / (cardinality + self.eps)
-
-        loss = torch.mean(1. - dice_score, 0)
-
-        return torch.dot(loss.float().cpu(), self.weights.float().cpu())
+        if self.weights is not None:
+            dims = (2, 3)
+            intersection = torch.sum(input * target_one_hot, dims)
+            cardinality = torch.sum(input + target_one_hot, dims)
+            dice_score = 2. * intersection / (cardinality + self.eps)
+            loss = torch.mean(1. - dice_score, 0)
+            return torch.dot(loss.float(), self.weights.float())
+        else:
+            dims = (1, 2, 3)
+            intersection = torch.sum(input * target_one_hot, dims)
+            cardinality = torch.sum(input + target_one_hot, dims)
+            dice_score = 2. * intersection / (cardinality + self.eps)
+            return torch.mean(1. - dice_score)
