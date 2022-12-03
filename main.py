@@ -46,7 +46,7 @@ model = SegmentationModel()
 trainer = Trainer(
     accelerator="gpu",
     devices=1,
-    max_epochs=1000,
+    max_epochs=300,
     min_epochs=50,
 )
 
