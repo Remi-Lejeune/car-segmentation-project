@@ -10,7 +10,7 @@ class SegmentationModel(pl.LightningModule):
     def __init__(self, weights=None):
         super().__init__()
         self.save_hyperparameters()
-        self.network = UNet(n_channels=3, n_classes=9)
+        self.network = UNet(n_channels=1, n_classes=9)
         self.register_buffer("weights", weights)
         self.dice_loss = DiceLoss(weights=self.weights)
         self.cross_entropy = CrossEntropyLoss(weight=self.weights)
@@ -29,7 +29,8 @@ class SegmentationModel(pl.LightningModule):
     def training_step(self, batch, batch_nb):
         x, y = batch
         y_hat = self.network(x).float()
-        loss = self.dice_loss(F.softmax(y_hat, dim=1), y.float()) # + self.cross_entropy(y_hat.float(), y.float())
+        loss = self.dice_loss(F.softmax(y_hat, dim=1), y.float()) + self.cross_entropy(y_hat.float(), y.float())
+
         self.log("train_loss", loss)
         return loss
 
@@ -40,19 +41,19 @@ class SegmentationModel(pl.LightningModule):
         # Use dice score here
         loss = 1.0 - self.dice_loss(F.softmax(y_hat, dim=1).float(), y.float())
 
-        self.log("test_loss", loss)
+        self.log("test_score", loss)
         return loss
 
     def validation_step(self, batch, batch_idx):
         x, y = batch
         y_hat = self.network(x).float()
-        loss = self.dice_loss(F.softmax(y_hat, dim=1).float(), y.float()) # + self.cross_entropy(y_hat.float(), y.float())
+        loss = self.dice_loss(F.softmax(y_hat, dim=1).float(), y.float()) + self.cross_entropy(y_hat.float(), y.float())
 
-        self.log("validation test score", loss)
+        self.log("val_loss", loss)
         return loss
 
     def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters(), lr=1e-3)
+        return torch.optim.Adamax(self.parameters(), lr=1e-3)
 
     def forward(self, x):
         return self.network.forward(x)

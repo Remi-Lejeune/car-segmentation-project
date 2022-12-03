@@ -1,6 +1,9 @@
+import torch
+from unet_model import *
 from image_dataset import *
 import matplotlib.pyplot as plt
 from augmentation import *
+from dice_loss import *
 
 
 def plot_transformed_img(input, output):
@@ -9,6 +12,15 @@ def plot_transformed_img(input, output):
     axs[0].set_title("Image")
     axs[1].imshow(output)
     axs[1].set_title("Mask")
+    plt.show()
+
+
+def plot_masks(masks):
+    fig, axs = plt.subplots(nrows=3, ncols=3, figsize=(27, 27))
+    axs = axs.flatten()
+    for i in range(9):
+        axs[i].imshow(masks[i], cmap='gray')
+        axs[i].set_title(f"Mask n.{i}")
     plt.show()
 
 
@@ -29,6 +41,21 @@ print(f"Input shape = {input.shape}, Output shape = {output.shape}")
 
 # Show the results
 plot_transformed_img(np.transpose(input, (1, 2, 0)), output)
+masks = get_output_masks(output)
+print(f"Masks shape = {masks.shape}")
+plot_masks(masks)
+
+
+input = torch.tensor(input).reshape(1, 1, 256, 256)
+masks = torch.tensor(masks)
+print(f"Masks shape{masks.shape}")
+net = UNet(n_channels=1, n_classes=9)
+y_hat = net(input)
+print(f"Y_hat shape = {y_hat.shape}")
+loss = DiceLoss()
+print(loss(y_hat, masks))
+
+
 
 
 

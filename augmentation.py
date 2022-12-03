@@ -37,12 +37,12 @@ def similarity_transform_image(input, output, H=256, W=256, point=None):
         ax_0 = point[0]
         ax_1 = point[1]
     transf_matrix = transform.SimilarityTransform(translation=(ax_0, ax_1))
-    transf_input = transform.warp(np.transpose(input, (1, 2, 0)), transf_matrix)
-    transf_output = transform.warp(output.reshape(H, W), transf_matrix)
+    transf_input = transform.warp(np.transpose(input, (1, 2, 0)), transf_matrix.inverse)
+    transf_output = transform.warp(output.reshape(H, W), transf_matrix.inverse)
     return np.transpose(transf_input, (2, 0, 1)), transf_output
 
 
-def flip_im(input, output):
+def flip_im(input, output, H=256, W=256):
     """
     Flip the input image and the corresponding mask
     :param input: image with shape (n_channels, H, W)
@@ -59,7 +59,7 @@ def flip_im(input, output):
     return trans_im, trans_seg
 
 
-def zoom_im(input, output, min_crop_sz=150):
+def zoom_im(input, output, min_crop_sz=128, H=256, W=256, crop_sz=None):
     """
     Zoom in the input image and the corresponding mask
     :param input: image with shape (n_channels, H, W)
@@ -74,7 +74,9 @@ def zoom_im(input, output, min_crop_sz=150):
     seg = torch.from_numpy(output).reshape(1, H, W)
     seg = torch.reshape(seg, (1, H, W))
 
-    crop_sz = int(random.uniform(a=min_crop_sz, b=im.shape[1]))
+    if crop_sz is None:
+       crop_sz  = int(random.uniform(a=min_crop_sz, b=im.shape[1]))
+
 
     # Apply center crop and resize to the original size
     trans_im = transforms.CenterCrop(size=crop_sz)(im)

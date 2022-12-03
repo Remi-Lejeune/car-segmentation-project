@@ -8,13 +8,17 @@ from augmentation import *
 
 
 def get_transformed_items(input, output):
-    prob = np.random.randint(low=0, high=3)
+    prob = np.random.randint(low=0, high=5)
     if prob == 0:
         return input, output
     if prob == 1:
         return rotate_image(input, output)
     if prob == 2:
         return similarity_transform_image(input, output)
+    if prob == 3:
+        return zoom_im(input, output)
+    if prob == 4:
+        return flip_im(input, output)
 
 
 def get_output_masks(output):
@@ -40,16 +44,12 @@ class ImageDataset(Dataset):
 
     def __getitem__(self, idx):
         image = np.load(self.files[idx]).astype(np.float32)
-        '''# Gray-scaling the input of shape = (1, 256, 256)
-        x = rgb2gray(image[:3])
-        # features map of shape (1, 256, 256)
-        y = image[3]
-        input_img, output_mask = get_transformed_items(x, y)
-        input_img = input_img.reshape(1, 256, 256)
-        output_mask = output_mask.reshape(256, 256)
-        masks = get_output_masks(output_mask)'''
 
-        return image[:3], get_output_masks(image[3])
+        gray_scaled_image = rgb2gray(image[:3])
+
+        input, output = get_transformed_items(gray_scaled_image, image[3])
+
+        return input, get_output_masks(output)
 
 
 def files_name(path='carseg_data/clean_data/*.np[yz]'):
@@ -58,17 +58,22 @@ def files_name(path='carseg_data/clean_data/*.np[yz]'):
 
 # function that outputs all files with a number and numpy extension
 def get_test_files():
-    
+    exclude = ["carseg_data/clean_data/0_a.npy", "carseg_data/clean_data/1_a.npy", "carseg_data/clean_data/2_a.npy",
+               "carseg_data/clean_data/3_a.npy", "carseg_data/clean_data/5_a.npy", "carseg_data/clean_data/6_a.npy",
+               "carseg_data/clean_data/10_a.npy", "carseg_data/clean_data/11_a.npy", "carseg_data/clean_data/12_a.npy",
+               "carseg_data/clean_data/19_a.npy", "carseg_data/clean_data/20_a.npy",
+               "carseg_data/clean_data/21_a.npy", "carseg_data/clean_data/22_a.npy", "carseg_data/clean_data/24_a.npy",
+               "carseg_data/clean_data/26_a.npy", "carseg_data/clean_data/28_a.npy", "carseg_data/clean_data/29_a.npy",
+               "carseg_data/clean_data/32_a.npy", "carseg_data/clean_data/33_a.npy", "carseg_data/clean_data/35_a.npy",
+               "carseg_data/clean_data/36_a.npy", "carseg_data/clean_data/39_a.npy", "carseg_data/clean_data/40_a.npy",
+               "carseg_data/clean_data/43_a.npy", "carseg_data/clean_data/45_a.npy", "carseg_data/clean_data/46_a.npy",
+               "carseg_data/clean_data/47_a.npy", "carseg_data/clean_data/50_a.npy", "carseg_data/clean_data/51_a.npy",
+               "carseg_data/clean_data/52_a.npy"
+               ]
 
-    exclude = ["carseg_data/clean_data/0_a.npy","carseg_data/clean_data/1_a.npy","carseg_data/clean_data/2_a.npy","carseg_data/clean_data/3_a.npy","carseg_data/clean_data/5_a.npy","carseg_data/clean_data/6_a.npy","carseg_data/clean_data/10_a.npy","carseg_data/clean_data/11_a.npy","carseg_data/clean_data/12_a.npy","carseg_data/clean_data/19_a.npy","carseg_data/clean_data/20_a.npy",
-                "carseg_data/clean_data/21_a.npy","carseg_data/clean_data/22_a.npy","carseg_data/clean_data/24_a.npy","carseg_data/clean_data/26_a.npy","carseg_data/clean_data/28_a.npy","carseg_data/clean_data/29_a.npy","carseg_data/clean_data/32_a.npy","carseg_data/clean_data/33_a.npy","carseg_data/clean_data/35_a.npy",
-                "carseg_data/clean_data/36_a.npy","carseg_data/clean_data/39_a.npy","carseg_data/clean_data/40_a.npy","carseg_data/clean_data/43_a.npy","carseg_data/clean_data/45_a.npy","carseg_data/clean_data/46_a.npy","carseg_data/clean_data/47_a.npy","carseg_data/clean_data/50_a.npy","carseg_data/clean_data/51_a.npy","carseg_data/clean_data/52_a.npy"
-                ]
-    
     include = (exclude)
-    
-    return include
 
+    return include
 
 
 def get_clean_files(path='carseg_data/clean_data/'):
