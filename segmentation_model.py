@@ -29,7 +29,7 @@ class SegmentationModel(pl.LightningModule):
     def training_step(self, batch, batch_nb):
         x, y = batch
         y_hat = self.network(x).float()
-        loss = self.dice_loss(F.softmax(y_hat, dim=1), y.float()) + self.cross_entropy(y_hat.float(), y.float())
+        loss = self.dice_loss(F.softmax(y_hat, dim=1), y.float()) # + self.cross_entropy(y_hat.float(), y.float())
 
         self.log("train_loss", loss)
         return loss
@@ -47,7 +47,7 @@ class SegmentationModel(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         x, y = batch
         y_hat = self.network(x).float()
-        loss = self.dice_loss(F.softmax(y_hat, dim=1).float(), y.float()) + self.cross_entropy(y_hat.float(), y.float())
+        loss = self.dice_loss(F.softmax(y_hat, dim=1).float(), y.float()) # + self.cross_entropy(y_hat.float(), y.float())
 
         self.log("val_loss", loss)
         return loss
