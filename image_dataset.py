@@ -29,9 +29,10 @@ def get_output_masks(output):
 
 
 class ImageDataset(Dataset):
-    def __init__(self, files, size=None):
+    def __init__(self, files, size=None, is_test=False):
 
         self.files = files
+        self.is_test = is_test
 
         if size is not None and size < len(files):
             self.files = self.files[:size]
@@ -47,7 +48,10 @@ class ImageDataset(Dataset):
 
         gray_scaled_image = rgb2gray(image[:3])
 
-        input, output = get_transformed_items(gray_scaled_image, image[3])
+        if not self.is_test:
+            input, output = get_transformed_items(image[:3], image[3])
+        else:
+            input, output = image[:3], image[3]
 
         return input, get_output_masks(output)
 
@@ -83,7 +87,11 @@ def get_clean_files(path='carseg_data/clean_data/'):
 
 
 def get_files(path='carseg_data/clean_data/'):
-    return glob.glob(path + "[0-9]*.np[yz]")
+    photos_files = glob.glob(path + "[0-9]*.np[yz]")
+    #door_files = glob.glob(path + "DOOR_[0-9]*.npy")
+    #opel_files = glob.glob(path + "OPEL_[0-9]*.npy")
+    files = [file for file in photos_files] # + [file for file in door_files] + [file for file in opel_files]
+    return files
 
 
 def photos_file_name(path='carseg_data/carseg_raw_data/train/photo/*.jpg'):

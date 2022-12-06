@@ -10,7 +10,7 @@ class SegmentationModel(pl.LightningModule):
     def __init__(self, weights=None):
         super().__init__()
         self.save_hyperparameters()
-        self.network = UNet(n_channels=1, n_classes=9)
+        self.network = UNet(n_channels=3, n_classes=9)
         self.register_buffer("weights", weights)
         self.dice_loss = DiceLoss(weights=self.weights)
         self.cross_entropy = CrossEntropyLoss(weight=self.weights)

@@ -30,6 +30,15 @@ def rgb2gray(rgb):
     return gray.reshape(1, rgb.shape[1], rgb.shape[2])
 
 
+
+files = get_clean_files()
+np.random.seed(0)
+np.random.shuffle(files)
+print(files[int(len(files)*0.9):])
+
+
+
+"""
 image = np.load("carseg_data/clean_data/31.npy").astype(np.float32)
 gray_scaled_img = rgb2gray(image[:3])
 
@@ -54,7 +63,7 @@ y_hat = net(input)
 print(f"Y_hat shape = {y_hat.shape}")
 loss = DiceLoss()
 print(loss(y_hat, masks))
-
+"""
 
 
 

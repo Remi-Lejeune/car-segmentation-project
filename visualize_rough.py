@@ -6,13 +6,14 @@ from image_dataset import ImageDataset, files_name
 import torch.nn.functional as F
 from image_dataset import *
 import torch
+from dice_loss import DiceLoss
 
 
 def get_masks_pred(model, x):
     y_hat = model(x)
+    y_hat = F.softmax(y_hat, dim=1)
     y_hat = F.one_hot(y_hat.argmax(dim=1), 9).permute(0, 3, 1, 2).float()
-    y_hat = y_hat.detach().numpy()
-    return y_hat.astype(int)
+    return y_hat
 
 
 def plot_output_and_pred(y_hat, y, title):
@@ -28,7 +29,7 @@ def plot_output_and_pred(y_hat, y, title):
     plt.suptitle(title.split("/")[-1].split(".")[0])
     fig.tight_layout()
     fig.subplots_adjust(top=0.99)
-    plt.show()
+    plt.savefig(title+".svg")
 
 
 def get_masks_out(y):
@@ -40,45 +41,52 @@ def get_masks_out(y):
 
 
 test_files = get_test_files()
-files = get_clean_files()
-#print(files)
-
-path = "carseg_data/clean_data/0_a.npy"
-
-print(path in files)
-
-
-"""
-model = SegmentationModel.load_from_checkpoint(checkpoint_path="epoch=999-step=70000.ckpt")
-
+test_dataset = ImageDataset(test_files, is_test=True)
+test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=False)
+model = SegmentationModel.load_from_checkpoint(checkpoint_path="epoch=299-step=20400.ckpt")
 # disable randomness, dropout, etc...
 model.eval()
 
 dice_losses = []
+loss = DiceLoss()
+it = iter(test_dataloader)
 
-for file in test_files:
-    image = np.load(file).astype(np.float32)
-    x = torch.tensor(image[:3].reshape(1, 3, 256, 256))
-    y = get_masks_out(image[3])
+for x, y in it:
     y_hat = get_masks_pred(model, x)
-
-    eps = 10e-6
-    dims = (1, 2, 3)
-    intersection = np.sum(y_hat * y, dims)
-    cardinality = np.sum(y_hat + y, dims)
-    dice_score = 2. * intersection / (cardinality + eps)
-    dice_losses.append(np.mean(1. - dice_score))
-
-    # plot_output_and_pred(y_hat, y, title=file)
-
+    dice_loss = loss(y_hat, y)
+    dice_losses.append(dice_loss)
 
 worst_pred_idx = np.argmax(dice_losses)
-print(test_files[worst_pred_idx])
+print(np.max(dice_losses))
+print(np.min(dice_losses))
+best_pred_idx = np.argmin(dice_losses)
+worst_filepath = test_files[worst_pred_idx]
+best_filepath = test_files[best_pred_idx]
+
+image = np.load(worst_filepath).astype(np.float32)
+y = get_output_masks(image[3])
+y_hat = get_masks_pred(model, torch.tensor(image[:3].reshape(1, 3, 256, 256)))
+y_hat = y_hat.detach().numpy()
+
+y_hat_categorical = np.argmax(y_hat, axis=1)
+
+np.save("worst_sample", y_hat_categorical)
+
+plot_output_and_pred(y_hat, y, title="Worst sample")
+
+image = np.load(best_filepath).astype(np.float32)
+y = get_output_masks(image[3])
+y_hat = get_masks_pred(model, torch.tensor(image[:3].reshape(1, 3, 256, 256)))
+y_hat = y_hat.detach().numpy()
+
+y_hat_categorical = np.argmax(y_hat, axis=1)
+np.save("best_sample", y_hat_categorical)
+plot_output_and_pred(y_hat, y, title="Best sample")
+
+file_dict = {"best": best_filepath, "worst": worst_filepath}
+
+with open("files", "w") as f:
+    f.write(file_dict.__str__())
 
 
-image = np.load(test_files[worst_pred_idx]).astype(np.float32)
-x = torch.tensor(image[:3].reshape(1, 3, 256, 256))
-y = get_masks_out(image[3])
-y_hat = get_masks_pred(model, x)
-plot_output_and_pred(y_hat, y, title=test_files[worst_pred_idx])
-"""
+

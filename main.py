@@ -6,26 +6,23 @@ from image_dataset import *
 from segmentation_model import SegmentationModel
 
 
-#files = files_name()
 clean_files = get_clean_files()
 test_files = get_test_files()
+np.random.seed(0)
 np.random.shuffle(clean_files)
 
 train_files = clean_files[:int(len(clean_files) * 0.9)]
 validation_files = clean_files[int(len(clean_files) * 0.9):]
 
 train_dataset = ImageDataset(train_files)
-test_dataset = ImageDataset(test_files)
+test_dataset = ImageDataset(test_files, is_test=True)
 validation_dataset = ImageDataset(validation_files)
 
 train_dataloader = DataLoader(train_dataset, batch_size=16, shuffle=True)
 test_dataloader = DataLoader(test_dataset, batch_size=16, shuffle=False)
 validation_dataloader = DataLoader(validation_dataset, batch_size=16, shuffle=False)
 
-
-
-
-# Compute class weight from the trianing data.
+# Compute class weight from the training data.
 it = iter(train_dataloader)
 weights = np.zeros(9)
 for batch_im, batch_label in it:
